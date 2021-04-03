@@ -25,7 +25,7 @@ export default class SignIn extends Component {
     handleSubmit(e) {
         e.preventDefault()
 
-        this.props.history.push("/main");
+        this.props.history.push("/courses");
         console.log("Successful Login")
     }
     render() {
