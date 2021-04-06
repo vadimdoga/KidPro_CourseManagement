@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Segment } from "semantic-ui-react"
-import CourseDetails from "./CourseDetails"
+import CourseDetails from "../../course_components/CourseDetails"
 import HeaderComponent from "../../header/HeaderComponent"
 
 
