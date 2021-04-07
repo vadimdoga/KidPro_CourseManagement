@@ -4,7 +4,7 @@ import { Accordion, Icon, Popup } from 'semantic-ui-react'
 
 import HeaderComponent from "../../header/HeaderComponent"
 import ExpandDetails from "../../course_components/ExpandDetails"
-import LessonDetails from "./LessonDetails"
+import LessonDetails from "../content_types/LessonDetails"
 
 const gradeOptions = [
     { key: 'grade_1', text: 'Grade I', value: 'grade_1' },
@@ -131,7 +131,7 @@ export default class EditCourse extends Component {
         const new_key = "key_" + length
 
         let children = this.state.components["children"]
-        children[new_key] = <ExpandDetails key="grade_3_maths" title={this.state.lessonName}>Lesson details will be here</ExpandDetails>
+        children[new_key] = <ExpandDetails key="grade_3_maths" title={this.state.lessonName}><LessonDetails /></ExpandDetails>
 
         this.setState({
             components: {
