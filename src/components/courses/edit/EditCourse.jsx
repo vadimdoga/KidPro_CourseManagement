@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { v4 as uuid } from "uuid"
 import { Button, Form, Input, Segment, Select, TextArea } from 'semantic-ui-react'
 import { Accordion, Icon, Popup } from 'semantic-ui-react'
 
@@ -52,10 +53,7 @@ export default class EditCourse extends Component {
             gradeOption: "",
             children: [],
             lessonName: "",
-            components: {
-                length: 0,
-                children: {}
-            }
+            components: {}
         }
 
     }
@@ -64,27 +62,16 @@ export default class EditCourse extends Component {
         const id = this.props.match.params.id;
         console.log(id)
 
-        let length = this.state.components.length + 1
-        let new_key = "key_" + length
-        let children = this.state.components["children"]
+        let children = this.state.components
 
-        children[new_key] = <ExpandDetails key="maths_grade_1" title="Maths grade 1"><LessonDetails /></ExpandDetails>
-
-        length = length + 1
-        new_key = "key_" + length
-        children[new_key] = <ExpandDetails key="maths_grade_2" title="Maths grade 2"><LessonDetails /></ExpandDetails>
-
-        const total_length = getCount(children) + this.state.components.length
+        children[uuid()] = <ExpandDetails key={uuid()} title="Maths grade 1"><LessonDetails /></ExpandDetails>
+        children[uuid()] = <ExpandDetails key={uuid()} title="Maths grade 2"><LessonDetails /></ExpandDetails>
 
         this.setState({
             courseName: "Lorem Ipsum",
             courseDescription: "Lorem Ipsum",
             gradeOption: "grade_3",
-            components: {
-                children: children,
-                length: total_length,
-                new_length: getCount(this.state.components.children)
-            }
+            components: children
         })
     }
 
@@ -98,14 +85,11 @@ export default class EditCourse extends Component {
         const key = e.currentTarget.value
 
         if (key !== undefined) {
-            const children = this.state.components["children"]
+            const children = this.state.components
             delete children[key]
 
             this.setState({
-                components: {
-                    children: children,
-                    length: this.state.components.length - 1
-                }
+                components: children
             })
         }
     }
@@ -127,17 +111,11 @@ export default class EditCourse extends Component {
     }
 
     handleAddExpandable(e) {
-        const length = this.state.components.length + 1
-        const new_key = "key_" + length
-
-        let children = this.state.components["children"]
-        children[new_key] = <ExpandDetails key="grade_3_maths" title={this.state.lessonName}><LessonDetails /></ExpandDetails>
+        let children = this.state.components
+        children[uuid()] = <ExpandDetails key={uuid()} title={this.state.lessonName}><LessonDetails /></ExpandDetails>
 
         this.setState({
-            components: {
-                length: length,
-                children: children
-            },
+            components: children,
             lessonName: ""
         })
     }
@@ -208,7 +186,7 @@ export default class EditCourse extends Component {
 
                     <Accordion style={accordion_style} fluid styled>
                         {
-                            Object.entries(this.state.components["children"]).map(this.createExpandable)
+                            Object.entries(this.state.components).map(this.createExpandable)
                         }
                     </Accordion>
                 </Segment>
