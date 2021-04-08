@@ -2,10 +2,6 @@ import React, { Component } from 'react'
 import { Accordion, Button, Icon } from 'semantic-ui-react'
 
 
-const accordion_title_style = {
-    backgroundColor: "#fdfcfa"
-}
-
 export default class ExpandDetails extends Component {
     constructor(props) {
         super(props)
@@ -29,7 +25,7 @@ export default class ExpandDetails extends Component {
         return (
             <div>
                 <Accordion.Title
-                    style={accordion_title_style}
+                    style={{backgroundColor: this.props.backgroundColor}}
                     active={this.state.activeIndex === 0}
                     index={0}
                     onClick={this.handleClick}
