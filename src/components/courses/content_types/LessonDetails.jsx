@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
-import { Button, Form, Input, Accordion, Dropdown, TextArea } from 'semantic-ui-react'
+import { Button, Form, Input, Accordion, Dropdown, TextArea, Popup } from 'semantic-ui-react'
 import ExpandDetails from "../../course_components/ExpandDetails"
-
+import { v4 as uuid } from "uuid"
 
 
 const accordion_style = {
-    marginTop: "1rem",
+    margin: "1rem",
+    width: "98%",
     textAlign: "left"
 }
 
@@ -19,6 +20,7 @@ const btn_right_style = {
 }
 
 const contentOptions = [
+
     { key: 1, text: 'Lecture', value: "lecture" },
     { key: 2, text: 'Exercise', value: "exercise" }
 ]
@@ -30,48 +32,73 @@ export default class LessonDetails extends Component {
 
         this.handleAddContent = this.handleAddContent.bind(this)
         this.createExpandable = this.createExpandable.bind(this)
+        this.handleRemove = this.handleRemove.bind(this)
+        this.handleMoveUp = this.handleMoveUp.bind(this)
+        this.handleMoveDown = this.handleMoveDown.bind(this)
 
         this.state = {
             lessonName: "",
             lessonDescription: "",
             contentType: "",
-            components: {
-                children: {},
-                length: 0,
-            }
+            contentName: "",
+            components: {}
         }
 
     }
 
-    handleAddContent(e) {
-        const length = this.state.components.length + 1
-        const new_key = "key_" + length
+    handleRemove(e) {
+        const key = e.currentTarget.value
 
-        let children = this.state.components["children"]
+        if (key !== undefined) {
+            const children = this.state.components
+            delete children[key]
+
+            this.setState({
+                components: children
+            })
+        }
+    }
+
+    handleMoveUp(e) {
+        const element = document.querySelector("#" + e.currentTarget.value)
+
+        if (element !== undefined)
+            if (element.previousElementSibling)
+                element.parentNode.insertBefore(element, element.previousElementSibling);
+    }
+
+    handleMoveDown(e) {
+        const element = document.querySelector("#" + e.currentTarget.value)
+
+        if (element !== undefined)
+            if (element.nextElementSibling)
+                element.parentNode.insertBefore(element.nextElementSibling, element);
+    }
+
+    handleAddContent(e) {
+        console.log(this.state.contentType)
+        const uuidKey = uuid()
+        let children = this.state.components
 
         if (this.state.contentType === "exercise") {
-            children[new_key] = <ExpandDetails key="division" title={this.state.lessonName}>This is an exercise</ExpandDetails>
+            children[uuidKey] = <ExpandDetails key={uuidKey} title={this.state.contentName} backgroundColor="white">This is an exercise</ExpandDetails>
 
         } else if (this.state.contentType === "lecture") {
-            children[new_key] = <ExpandDetails key="division" title={this.state.lessonName}>This is a lecture</ExpandDetails>
+            children[uuidKey] = <ExpandDetails key={uuidKey} title={this.state.contentName} backgroundColor="#fdfcfa">This is a lecture</ExpandDetails>
         }
 
         this.setState({
-            components: {
-                length: length,
-                children: children
-            },
-            contentType: ""
+            components: children,
+            contentName: ""
         })
     }
 
     createExpandable([key, value]) {
-        const id = "expandable-list-" + key
-        console.log(id)
+        const id = "expandable-list-" + uuid()
         return <div key={id} id={id}>
             <Button style={btn_right_style} onClick={this.handleRemove} value={key} floated="right" color="red" icon="remove circle" size="mini" />
-            <Button style={btn_style} onClick={this.handleMoveDown} value={id} floated="right" color="blue" icon="arrow circle down" size="mini" />
-            <Button style={btn_style} onClick={this.handleMoveUp} value={id} floated="right" color="blue" icon="arrow circle up" size="mini" />
+            <Button style={btn_style} onClick={this.handleMoveDown} value={id} floated="right" color="yellow" icon="arrow circle down" size="mini" />
+            <Button style={btn_style} onClick={this.handleMoveUp} value={id} floated="right" color="yellow" icon="arrow circle up" size="mini" />
             {value}
         </div>
     }
@@ -96,18 +123,35 @@ export default class LessonDetails extends Component {
                         label='Description'
                         placeholder='Lesson description'
                         value={this.state.lessonDescription}
+                        selection
                         onChange={e => this.setState({ lessonDescription: e.target.value })}
                     />
                 </Form>
                 <br />
-                <Dropdown placeholder="Choose content type" clearable options={contentOptions} selection onChange={e => this.setState({ contentType: e.target.value })} value={this.state.contentType} />
-                <Button onClick={this.handleAddContent} style={{ marginLeft: "1rem" }} circular size="small" color="teal" icon='plus circle' />
+                <Dropdown
+                    placeholder="Choose content type"
+                    search
+                    options={contentOptions}
+                    selection
+                    onChange={(e, data) => this.setState({ contentType: data.value })}
+                    value={this.state.contentType}
+                />
+                <Popup
+                    trigger={<Button style={{ marginLeft: "1rem" }} circular size="small" color="teal" icon='plus circle' />}
+                    content={
+                        <div>
+                            <Input onChange={e => this.setState({ contentName: e.target.value })} value={this.state.contentName} style={{ marginBottom: "1rem" }} placeholder='Content Name' />
+                            <Button onClick={this.handleAddContent} basic color='green' content='Create Content' />
+                        </div>}
+                    on='click'
+                />
 
                 <Accordion style={accordion_style} fluid styled>
                     {
-                        Object.entries(this.state.components["children"]).map(this.createExpandable)
+                        Object.entries(this.state.components).map(this.createExpandable)
                     }
                 </Accordion>
+                <Button basic color="blue">Save</Button>
             </div>
         )
     }
