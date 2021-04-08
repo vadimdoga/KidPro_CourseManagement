@@ -64,8 +64,8 @@ export default class EditCourse extends Component {
 
         let children = this.state.components
 
-        children[uuid()] = <ExpandDetails key={uuid()} title="Maths grade 1"><LessonDetails /></ExpandDetails>
-        children[uuid()] = <ExpandDetails key={uuid()} title="Maths grade 2"><LessonDetails /></ExpandDetails>
+        children[uuid()] = <ExpandDetails key={uuid()} title="Maths grade 1" backgroundColor="#fdfcfa" ><LessonDetails /></ExpandDetails>
+        children[uuid()] = <ExpandDetails key={uuid()} title="Maths grade 2" backgroundColor="#fdfcfa" ><LessonDetails /></ExpandDetails>
 
         this.setState({
             courseName: "Lorem Ipsum",
@@ -112,7 +112,7 @@ export default class EditCourse extends Component {
 
     handleAddExpandable(e) {
         let children = this.state.components
-        children[uuid()] = <ExpandDetails key={uuid()} title={this.state.lessonName}><LessonDetails /></ExpandDetails>
+        children[uuid()] = <ExpandDetails key={uuid()} title={this.state.lessonName} backgroundColor="#fdfcfa" ><LessonDetails /></ExpandDetails>
 
         this.setState({
             components: children,
@@ -179,7 +179,7 @@ export default class EditCourse extends Component {
                         content={
                             <div>
                                 <Input onChange={e => this.setState({ lessonName: e.target.value })} value={this.state.lessonName} style={{ marginBottom: "1rem" }} placeholder='Lesson Name' />
-                                <Button onClick={this.handleAddExpandable} color='green' content='Create Lesson' />
+                                <Button onClick={this.handleAddExpandable} basic color='green' content='Create Lesson' />
                             </div>}
                         on='click'
                     />
@@ -195,15 +195,3 @@ export default class EditCourse extends Component {
     }
 }
 
-
-function getCount(obj) {
-    var count = 0,
-        prop;
-
-    for (prop in obj) {
-        if (obj.hasOwnProperty(prop) && prop !== "average_age" && prop !== "count") {
-            count += 1;
-        }
-    }
-    return count;
-}
