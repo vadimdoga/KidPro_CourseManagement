@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Button, Form, Input, Accordion, Dropdown, TextArea, Popup } from 'semantic-ui-react'
 import ExpandDetails from "../../course_components/ExpandDetails"
+import ExerciseDetails from "./ExerciseDetails"
 import { v4 as uuid } from "uuid"
 
 
@@ -37,13 +38,24 @@ export default class LessonDetails extends Component {
         this.handleMoveDown = this.handleMoveDown.bind(this)
 
         this.state = {
-            lessonName: "",
+            lessonName: this.props.title,
             lessonDescription: "",
             contentType: "",
             contentName: "",
             components: {}
         }
 
+    }
+
+    componentDidMount() {
+        let children = this.state.components
+
+        // children[uuid()] = <ExpandDetails key={uuid()} title="Basic Fractions" backgroundColor="#fdfcfa" ><LessonDetails title="Basic Fractions" /></ExpandDetails>
+        children[uuid()] = <ExpandDetails key={uuid()} title="Multiplication with 2" backgroundColor="white" ><ExerciseDetails title="Multiplication with 2" /></ExpandDetails>
+
+        this.setState({
+            components: children
+        })
     }
 
     handleRemove(e) {
@@ -81,7 +93,7 @@ export default class LessonDetails extends Component {
         let children = this.state.components
 
         if (this.state.contentType === "exercise") {
-            children[uuidKey] = <ExpandDetails key={uuidKey} title={this.state.contentName} backgroundColor="white">This is an exercise</ExpandDetails>
+            children[uuidKey] = <ExpandDetails key={uuidKey} title={this.state.contentName} backgroundColor="white"><ExerciseDetails title={this.state.contentName} /></ExpandDetails>
 
         } else if (this.state.contentType === "lecture") {
             children[uuidKey] = <ExpandDetails key={uuidKey} title={this.state.contentName} backgroundColor="#fdfcfa">This is a lecture</ExpandDetails>
@@ -137,7 +149,7 @@ export default class LessonDetails extends Component {
                     value={this.state.contentType}
                 />
                 <Popup
-                    trigger={<Button style={{ marginLeft: "1rem" }} circular size="small" color="teal" icon='plus circle' />}
+                    trigger={<Button style={{ marginLeft: "1rem" }} circular size="small" color="yellow" icon='plus circle' />}
                     content={
                         <div>
                             <Input onChange={e => this.setState({ contentName: e.target.value })} value={this.state.contentName} style={{ marginBottom: "1rem" }} placeholder='Content Name' />
