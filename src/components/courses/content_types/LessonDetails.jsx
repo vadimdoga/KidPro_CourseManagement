@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Button, Form, Input, Accordion, Dropdown, TextArea, Popup } from 'semantic-ui-react'
 import ExpandDetails from "../../course_components/ExpandDetails"
 import ExerciseDetails from "./ExerciseDetails"
+import PopupDetails from "../../course_components/PopupDetails"
 import { v4 as uuid } from "uuid"
 
 
@@ -148,14 +149,12 @@ export default class LessonDetails extends Component {
                     onChange={(e, data) => this.setState({ contentType: data.value })}
                     value={this.state.contentType}
                 />
-                <Popup
-                    trigger={<Button style={{ marginLeft: "1rem" }} circular size="small" color="yellow" icon='plus circle' />}
+                <PopupDetails
+                    btnColor="yellow"
+                    onClickFnc={this.handleAddContent}
                     content={
-                        <div>
-                            <Input onChange={e => this.setState({ contentName: e.target.value })} value={this.state.contentName} style={{ marginBottom: "1rem" }} placeholder='Content Name' />
-                            <Button onClick={this.handleAddContent} basic color='green' content='Create Content' />
-                        </div>}
-                    on='click'
+                        <Input onChange={e => this.setState({ contentName: e.target.value })} value={this.state.contentName} style={{ marginBottom: "1rem" }} placeholder='Content Name' />
+                    }
                 />
 
                 <Accordion style={accordion_style} fluid styled>

@@ -3,6 +3,7 @@ import { v4 as uuid } from "uuid"
 import { Button, Form, Input, Segment, Select, TextArea } from 'semantic-ui-react'
 import { Accordion, Icon, Popup } from 'semantic-ui-react'
 
+import PopupDetails from "../../course_components/PopupDetails"
 import HeaderComponent from "../../header/HeaderComponent"
 import ExpandDetails from "../../course_components/ExpandDetails"
 import LessonDetails from "../content_types/LessonDetails"
@@ -174,14 +175,12 @@ export default class EditCourse extends Component {
                 </Segment>
                 <Segment style={segment_style} color="blue" size="small">
                     <span style={{ fontWeight: "bold", margin: "1rem" }}>New Lesson</span>
-                    <Popup
-                        trigger={<Button circular size="small" color="teal" icon='plus circle' />}
+                    <PopupDetails
+                        btnColor="teal"
+                        onClickFnc={this.handleAddExpandable}
                         content={
-                            <div>
-                                <Input onChange={e => this.setState({ lessonName: e.target.value })} value={this.state.lessonName} style={{ marginBottom: "1rem" }} placeholder='Lesson Name' />
-                                <Button onClick={this.handleAddExpandable} basic color='green' content='Create Lesson' />
-                            </div>}
-                        on='click'
+                            <Input onChange={e => this.setState({ lessonName: e.target.value })} value={this.state.lessonName} style={{ marginBottom: "1rem" }} placeholder='Lesson Name' />
+                        }
                     />
 
                     <Accordion style={accordion_style} fluid styled>
