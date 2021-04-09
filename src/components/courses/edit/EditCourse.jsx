@@ -64,8 +64,8 @@ export default class EditCourse extends Component {
 
         let children = this.state.components
 
-        children[uuid()] = <ExpandDetails key={uuid()} title="Maths grade 1" backgroundColor="#fdfcfa" ><LessonDetails /></ExpandDetails>
-        children[uuid()] = <ExpandDetails key={uuid()} title="Maths grade 2" backgroundColor="#fdfcfa" ><LessonDetails /></ExpandDetails>
+        children[uuid()] = <ExpandDetails key={uuid()} title="Division and Multiplication" backgroundColor="#fdfcfa" ><LessonDetails title="Division and Multiplication" /></ExpandDetails>
+        children[uuid()] = <ExpandDetails key={uuid()} title="Introduction to fractions" backgroundColor="#fdfcfa" ><LessonDetails title="Introduction to fractions" /></ExpandDetails>
 
         this.setState({
             courseName: "Lorem Ipsum",
@@ -112,7 +112,7 @@ export default class EditCourse extends Component {
 
     handleAddExpandable(e) {
         let children = this.state.components
-        children[uuid()] = <ExpandDetails key={uuid()} title={this.state.lessonName} backgroundColor="#fdfcfa" ><LessonDetails /></ExpandDetails>
+        children[uuid()] = <ExpandDetails key={uuid()} title={this.state.lessonName} backgroundColor="#fdfcfa" ><LessonDetails title={this.state.lessonName} /></ExpandDetails>
 
         this.setState({
             components: children,
@@ -125,8 +125,8 @@ export default class EditCourse extends Component {
         console.log(id)
         return <div key={id} id={id}>
             <Button style={btn_right_style} onClick={this.handleRemove} value={key} floated="right" color="red" icon="remove circle" size="mini" />
-            <Button style={btn_style} onClick={this.handleMoveDown} value={id} floated="right" color="blue" icon="arrow circle down" size="mini" />
-            <Button style={btn_style} onClick={this.handleMoveUp} value={id} floated="right" color="blue" icon="arrow circle up" size="mini" />
+            <Button style={btn_style} onClick={this.handleMoveDown} value={id} floated="right" color="teal" icon="arrow circle down" size="mini" />
+            <Button style={btn_style} onClick={this.handleMoveUp} value={id} floated="right" color="teal" icon="arrow circle up" size="mini" />
             {value}
         </div>
     }
