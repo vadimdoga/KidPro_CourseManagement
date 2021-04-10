@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Accordion, Button, Icon } from 'semantic-ui-react'
+import { Accordion, Icon } from 'semantic-ui-react'
 
 
 export default class ExpandDetails extends Component {

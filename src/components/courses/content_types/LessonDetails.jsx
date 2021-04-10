@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import { Button, Form, Input, Accordion, Dropdown, TextArea, Popup } from 'semantic-ui-react'
+import { Button, Form, Input, Accordion, Dropdown, TextArea} from 'semantic-ui-react'
 import ExpandDetails from "../../course_components/ExpandDetails"
-import ExerciseDetails from "./ExerciseDetails"
+import PracticeDetails from "./PracticeDetails"
 import PopupDetails from "../../course_components/PopupDetails"
 import { v4 as uuid } from "uuid"
 
@@ -52,7 +52,8 @@ export default class LessonDetails extends Component {
         let children = this.state.components
 
         // children[uuid()] = <ExpandDetails key={uuid()} title="Basic Fractions" backgroundColor="#fdfcfa" ><LessonDetails title="Basic Fractions" /></ExpandDetails>
-        children[uuid()] = <ExpandDetails key={uuid()} title="Multiplication with 2" backgroundColor="white" ><ExerciseDetails title="Multiplication with 2" /></ExpandDetails>
+        children[uuid()] = <ExpandDetails key={uuid()} title="Multiplication with 2" backgroundColor="white" ><PracticeDetails title="Multiplication with 2" /></ExpandDetails>
+        children[uuid()] = <ExpandDetails key={uuid()} title="Multiplication with 5" backgroundColor="white" ><PracticeDetails title="Multiplication with 5" /></ExpandDetails>
 
         this.setState({
             components: children
@@ -94,7 +95,7 @@ export default class LessonDetails extends Component {
         let children = this.state.components
 
         if (this.state.contentType === "exercise") {
-            children[uuidKey] = <ExpandDetails key={uuidKey} title={this.state.contentName} backgroundColor="white"><ExerciseDetails title={this.state.contentName} /></ExpandDetails>
+            children[uuidKey] = <ExpandDetails key={uuidKey} title={this.state.contentName} backgroundColor="white"><PracticeDetails title={this.state.contentName} /></ExpandDetails>
 
         } else if (this.state.contentType === "lecture") {
             children[uuidKey] = <ExpandDetails key={uuidKey} title={this.state.contentName} backgroundColor="#fdfcfa">This is a lecture</ExpandDetails>

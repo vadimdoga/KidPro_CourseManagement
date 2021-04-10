@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { v4 as uuid } from "uuid"
-import { Button, Form, Input, Segment, Select, TextArea } from 'semantic-ui-react'
-import { Accordion, Icon, Popup } from 'semantic-ui-react'
+import { Button, Form, Input, Segment, Select, TextArea, Accordion } from 'semantic-ui-react'
 
 import PopupDetails from "../../course_components/PopupDetails"
 import HeaderComponent from "../../header/HeaderComponent"
