@@ -4,17 +4,17 @@ const initState = {
 }
 
 const lessonReducer = (state = initState, action) => {
-    if (action.type == 'CONFIGURE_LESSON') {
+    if (action.type === 'CONFIGURE_LESSON') {
         const lessonDetails = action.element
 
         return {
             ...state,
             lessonContent: lessonDetails
         }
-    } else if (action.type == 'ADD_LESSON') {
+    } else if (action.type === 'ADD_LESSON') {
         return {
             ...state,
-            lessons: [...lessons, lessonContent]
+            lessons: [...state.lessons, state.lessonContent]
         }
     }
 }
