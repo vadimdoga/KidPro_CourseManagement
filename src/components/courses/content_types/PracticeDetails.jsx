@@ -18,7 +18,6 @@ export default class PracticeDetails extends Component {
         this.handleRemove = this.handleRemove.bind(this)
         this.handleMoveUp = this.handleMoveUp.bind(this)
         this.handleMoveDown = this.handleMoveDown.bind(this)
-        this.handleLoadModal = this.handleLoadModal.bind(this)
 
         this.state = {
             practiceName: this.props.title,
