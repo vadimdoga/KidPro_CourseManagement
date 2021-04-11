@@ -17,6 +17,8 @@ const lessonReducer = (state = initState, action) => {
             lessons: [...state.lessons, state.lessonContent]
         }
     }
+
+    return state
 }
 
 export default lessonReducer

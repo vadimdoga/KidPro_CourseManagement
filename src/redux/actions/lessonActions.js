@@ -12,5 +12,4 @@ const configureLesson = (element, type) => {
     }
 }
 
-export default addLesson
-export default configureLesson
+export { addLesson, configureLesson }

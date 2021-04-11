@@ -5,10 +5,16 @@ import App from './components/App';
 import { BrowserRouter } from "react-router-dom"
 import 'semantic-ui-css/semantic.min.css'
 import { Provider } from 'react-redux'
-import { createStore } from "redux"
+import { createStore, combineReducers } from "redux"
 import lessonReducer from "./redux/reducers/lessonReducer"
+import modalReducer from "./redux/reducers/modalReducer"
 
-const store = createStore(lessonReducer)
+const allReducers = combineReducers({
+    lessons: lessonReducer,
+    isModalOpen: modalReducer
+})
+
+const store = createStore(allReducers)
 
 ReactDOM.render(
   <Provider store={store}>

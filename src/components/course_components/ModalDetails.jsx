@@ -1,22 +1,16 @@
 import React, { Component } from 'react'
 import { Modal, Button } from 'semantic-ui-react'
 
-export default class ModalDetails extends Component {
+//redux
+import { connect } from "react-redux"
+import { modifyModalState } from "../../redux/actions/modalActions"
+
+
+class ModalDetails extends Component {
     constructor(props) {
         super(props)
 
         this.handleSave = this.handleSave.bind(this)
-        this.handleClose = this.handleClose.bind(this)
-
-        this.state = {
-            isOpen: false
-        }
-    }
-
-    handleClose(e) {
-        this.setState({ isOpen: false })
-
-        this.props.handleClose(e)
     }
 
     handleSave(e) {
@@ -29,9 +23,9 @@ export default class ModalDetails extends Component {
         return (
             <Modal
                 closeIcon
-                onClose={this.handleClose}
-                onOpen={() => this.setState({isOpen: true})}
-                open={this.state.isOpen}
+                onClose={() => this.props.modifyModalState(false)}
+                onOpen={() => this.props.modifyModalState(true)}
+                open={this.props.isOpen}
                 trigger={<Button style={{ marginLeft: "1rem" }} circular size="small" color={this.props.btnColor} icon='plus circle' />}
             >
                 <Modal.Header>Configure Exercise</Modal.Header>
@@ -49,3 +43,17 @@ export default class ModalDetails extends Component {
         )
     }
 }
+
+const mapStateToProps = (state) => {
+    return {
+        isOpen: state.modalIsOpen
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        modifyModalState: (element) => { dispatch(modifyModalState(element, 'MODIFY_MODAL_STATE')) }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ModalDetails)
