@@ -18,6 +18,7 @@ export default class PracticeDetails extends Component {
         this.handleRemove = this.handleRemove.bind(this)
         this.handleMoveUp = this.handleMoveUp.bind(this)
         this.handleMoveDown = this.handleMoveDown.bind(this)
+        this.handleLoadModal = this.handleLoadModal.bind(this)
 
         this.state = {
             practiceName: this.props.title,
@@ -27,9 +28,18 @@ export default class PracticeDetails extends Component {
     }
 
     componentDidMount() {
+        const uuidKey = uuid()
         let children = this.state.components
 
-        children[uuid()] = <p>Exercise #1</p>
+        children[uuidKey] = {
+            "html": <span>test</span>,
+            "json": {
+                contentQuestion: "test",
+                contentAnswers: {"key": {"answer": "hey", "is_valid": true}},
+                speech_2_text: false,
+                image_blob: undefined
+            }
+        }
 
         this.setState({
             components: children
@@ -65,14 +75,18 @@ export default class PracticeDetails extends Component {
                 element.parentNode.insertBefore(element.nextElementSibling, element);
     }
 
-    handleAddContent(e) {
+    handleAddContent(e, exerciseDetails) {
+        console.log(exerciseDetails)
         const uuidKey = uuid()
-        let children = this.state.components
+        let components = this.state.components
 
-        children[uuidKey] = <span>{ uuidKey }</span>
+        components[uuidKey] = {
+            "html": <span>{ exerciseDetails["contentQuestion"] }</span>,
+            "json": exerciseDetails
+        }
 
         this.setState({
-            components: children,
+            components: components,
             contentName: ""
         })
     }
@@ -83,12 +97,11 @@ export default class PracticeDetails extends Component {
             <Button onClick={this.handleRemove} value={key} floated="right" color="red" icon="remove circle" size="mini" />
             <Button onClick={this.handleMoveDown} value={id} floated="right" color="green" icon="arrow circle down" size="mini" />
             <Button onClick={this.handleMoveUp} value={id} floated="right" color="green" icon="arrow circle up" size="mini" />
-            {value}
+            {value["html"]}
         </Segment>
     }
 
     render() {
-        console.log(this.state.contentAnswers)
         return (
             <div>
                 <Form>
@@ -114,7 +127,7 @@ export default class PracticeDetails extends Component {
                 </Form>
                 <br />
                 <span style={{ fontWeight: "bold", margin: "1rem" }}>Add Exercise</span>
-                <ExerciseModal practiceComponents={this.state.components} />
+                <ExerciseModal practiceHandleSave={this.handleAddContent} />
 
                 <Segment.Group style={exercises_style}>
                     {

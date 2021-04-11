@@ -22,7 +22,7 @@ export default class ModalDetails extends Component {
     handleSave(e) {
         this.setState({ isOpen: false })
 
-        return this.props.onClickFnc(e)
+        return this.props.exerciseHandleSave(e)
     }
 
     render() {

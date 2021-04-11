@@ -24,6 +24,7 @@ export default class ExerciseModal extends Component {
         this.fileChange = this.fileChange.bind(this)
         this.handleAddExercise = this.handleAddExercise.bind(this)
         this.handleModalClose = this.handleModalClose.bind(this)
+        this.handleSave = this.handleSave.bind(this)
 
         this.state = {
             contentQuestion: "",
@@ -121,11 +122,24 @@ export default class ExerciseModal extends Component {
         })
     }
 
+    handleSave(e) {
+        const exerciseDetails = {
+            contentQuestion: this.state.contentQuestion,
+            contentAnswers: this.state.contentAnswers,
+            speech_2_text: this.state.speech_2_text,
+            image_blob: this.state.image_blob
+        }
+
+        console.log(exerciseDetails)
+
+        this.props.practiceHandleSave(e, exerciseDetails)
+    }
+
     render() {
         return (
             <ModalDetails
                 btnColor="green"
-                onClickFnc={this.handleAddContent}
+                exerciseHandleSave={this.handleSave}
                 handleClose={this.handleModalClose}
             >
                 <Form>
@@ -165,6 +179,7 @@ export default class ExerciseModal extends Component {
 
                     <Form.Field
                         control={Checkbox}
+                        onClick={() => this.setState({speech_2_text: !this.state.speech_2_text})}
                         label={<label>Use speech to text feature?</label>}
                     />
                 </Form>
