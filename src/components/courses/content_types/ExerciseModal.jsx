@@ -1,16 +1,18 @@
 import React, { Component } from 'react'
-import { Form, Button, Segment, Checkbox} from 'semantic-ui-react'
-import ModalDetails from "../../course_components/ModalDetails"
-
+import { Form, Button, Segment, Checkbox, Modal } from 'semantic-ui-react'
 import { v4 as uuid } from "uuid"
 
+//redux
+import { connect } from "react-redux"
+import { modifyQaComponents } from "../../../redux/actions/contentActions"
+import { modifyModalState } from "../../../redux/actions/modalActions"
 
 const exercises_style = {
     width: "50%",
     margin: "1rem auto"
 }
 
-export default class ExerciseModal extends Component {
+class ExerciseModal extends Component {
     fileInputRef = React.createRef();
 
     constructor(props) {
@@ -28,18 +30,22 @@ export default class ExerciseModal extends Component {
 
         this.state = {
             contentQuestion: "",
-            contentAnswers: {},
             contentAnswer: "",
+            contentAnswers: {},
             speech_2_text: false,
-            image_blob: undefined
+            image_blob: undefined,
+
+            qaComponents: this.props.qaComponents[this.props.modalID]
         }
+
+        console.log(this.props.modalID)
     }
 
     handleModalClose(e) {
         this.setState({
             contentQuestion: "",
-            contentAnswers: {},
             contentAnswer: "",
+            contentAnswers: {},
             speech_2_text: false,
             image_blob: undefined
         })
@@ -49,11 +55,11 @@ export default class ExerciseModal extends Component {
         const key = e.currentTarget.value
 
         if (key !== undefined) {
-            const children = this.state.contentAnswers
-            delete children[key]
+            const components = this.state.qaComponents
+            delete components[key]
 
             this.setState({
-                contentAnswers: children
+                qaComponents: components
             })
         }
     }
@@ -76,12 +82,12 @@ export default class ExerciseModal extends Component {
 
     makeExerciseValid(e) {
         const key = e.currentTarget.getAttribute('json_key')
-        const contentAnswers = this.state.contentAnswers
+        const contentAnswer = this.state.contentAnswers
 
-        contentAnswers[key]["is_valid"] = !contentAnswers[key]["is_valid"]
+        contentAnswer[key]["is_valid"] = !contentAnswer[key]["is_valid"]
 
         this.setState({
-            contentAnswers: contentAnswers
+            contentAnswer: contentAnswer
         })
 
     }
@@ -92,57 +98,63 @@ export default class ExerciseModal extends Component {
         })
     }
 
-    createExercises([key, answer_json]) {
+    createExercises([key, json_specifics]) {
         const id = "exercise-list-" + uuid()
-        const is_valid = answer_json["is_valid"]
-        const value = answer_json["answer"]
+        const html_details = json_specifics[0]
+        const json_details = json_specifics[1]
+        const is_valid = json_details["is_valid"]
 
         return <Segment onClick={this.makeExerciseValid} json_key={key} style={{ padding: "1rem" }} key={id} id={id}>
             <Button onClick={this.handleRemoveExercise} value={key} floated="right" color="red" icon="remove circle" size="mini" />
             <Button onClick={this.handleMoveDown} value={id} floated="right" color="green" icon="arrow circle down" size="mini" />
             <Button onClick={this.handleMoveUp} value={id} floated="right" color="green" icon="arrow circle up" size="mini" />
-            <span style={{cursor: "pointer"}}>{is_valid ? <b>{value}</b> : value}</span>
+            <span style={{ cursor: "pointer" }}>{is_valid ? <b>{html_details}</b> : html_details}</span>
         </Segment>
     }
 
     handleAddExercise(e) {
-        const contentAnswers = this.state.contentAnswers
+        const components = this.state.qaComponents
         const key = uuid()
 
         const newAnswer = {
-            "answer": this.state.contentAnswer,
-            "is_valid": false
+            "html": <span>{this.state.contentAnswer}</span>,
+            "json": {
+                "answer": this.state.contentAnswer,
+                "is_valid": false,
+                "answers": this.state.contentAnswers,
+                "speech_2_text": this.state.speech_2_text,
+                "image_blob": this.state.image_blob
+            }
         }
 
-        contentAnswers[key] = newAnswer
+        components[key] = newAnswer
 
         this.setState({
-            contentAnswers: contentAnswers,
-            contentAnswer: ""
+            contentAnswer: "",
+            contentAnswers: {},
+            speech_2_text: false,
+            image_blob: undefined,
+            qaComponents: components
         })
     }
 
     handleSave(e) {
-        const exerciseDetails = {
-            contentQuestion: this.state.contentQuestion,
-            contentAnswers: this.state.contentAnswers,
-            speech_2_text: this.state.speech_2_text,
-            image_blob: this.state.image_blob
-        }
+        this.props.modifyModalState(false)
+        this.props.modifyQaComponents(this.state.qaComponents)
 
-        console.log(exerciseDetails)
-
-        this.props.practiceHandleSave(e, exerciseDetails)
+        this.props.practiceHandleSave(e)
     }
 
     render() {
         return (
-            <ModalDetails
-                btnColor="green"
-                exerciseHandleSave={this.handleSave}
-                handleClose={this.handleModalClose}
+            <Modal
+                closeIcon
+                as={Form}
+                onClose={() => this.props.modifyModalState(false)}
+                open={this.props.isOpen}
             >
-                <Form>
+                <Modal.Header>Configure Exercise</Modal.Header>
+                <Modal.Content>
                     <Form.Input
                         fluid
                         onChange={e => this.setState({ contentQuestion: e.target.value })}
@@ -173,17 +185,41 @@ export default class ExerciseModal extends Component {
                     </Form.Group>
                     <Segment.Group style={exercises_style}>
                         {
-                            Object.entries(this.state.contentAnswers).map(this.createExercises)
+                            Object.entries(this.state.qaComponents).map(this.createExercises)
                         }
                     </Segment.Group>
 
                     <Form.Field
                         control={Checkbox}
-                        onClick={() => this.setState({speech_2_text: !this.state.speech_2_text})}
+                        onClick={() => this.setState({ speech_2_text: !this.state.speech_2_text })}
                         label={<label>Use speech to text feature?</label>}
                     />
-                </Form>
-            </ModalDetails>
+                </Modal.Content>
+                <Modal.Actions>
+                    <Button
+                        content="Save"
+                        labelPosition='right'
+                        onClick={this.handleSave}
+                    />
+                </Modal.Actions>
+            </Modal>
         )
     }
 }
+
+const mapStateToProps = (state) => {
+    return {
+        qaComponents: state.content.qaComponents,
+        isOpen: state.modal.modalIsOpen,
+        modalID: state.modal.modalID
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        modifyQaComponents: (element) => { dispatch(modifyQaComponents(element, 'MODIFY_QA_COMPONENTS')) },
+        modifyModalState: (element) => { dispatch(modifyModalState(element, 'MODIFY_MODAL_STATE')) }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ExerciseModal)

@@ -5,6 +5,10 @@ import PracticeDetails from "./PracticeDetails"
 import PopupDetails from "../../course_components/PopupDetails"
 import { v4 as uuid } from "uuid"
 
+//redux
+import { connect } from "react-redux"
+import { modifyPracticeComponents } from "../../../redux/actions/contentActions"
+
 
 const accordion_style = {
     margin: "1rem",
@@ -28,7 +32,7 @@ const contentOptions = [
 ]
 
 
-export default class LessonDetails extends Component {
+class LessonDetails extends Component {
     constructor(props) {
         super(props)
 
@@ -43,32 +47,20 @@ export default class LessonDetails extends Component {
             lessonDescription: "",
             contentType: "",
             contentName: "",
-            components: {}
+            practiceComponents: this.props.localPracticeComponents
         }
 
-    }
-
-    componentDidMount() {
-        let children = this.state.components
-
-        // children[uuid()] = <ExpandDetails key={uuid()} title="Basic Fractions" backgroundColor="#fdfcfa" ><LessonDetails title="Basic Fractions" /></ExpandDetails>
-        children[uuid()] = <ExpandDetails key={uuid()} title="Multiplication with 2" backgroundColor="white" ><PracticeDetails title="Multiplication with 2" /></ExpandDetails>
-        children[uuid()] = <ExpandDetails key={uuid()} title="Multiplication with 5" backgroundColor="white" ><PracticeDetails title="Multiplication with 5" /></ExpandDetails>
-
-        this.setState({
-            components: children
-        })
     }
 
     handleRemove(e) {
         const key = e.currentTarget.value
 
         if (key !== undefined) {
-            const children = this.state.components
-            delete children[key]
+            const components = this.state.practiceComponents
+            delete components[key]
 
             this.setState({
-                components: children
+                practiceComponents: components
             })
         }
     }
@@ -90,21 +82,22 @@ export default class LessonDetails extends Component {
     }
 
     handleAddContent(e) {
-        console.log(this.state.contentType)
         const uuidKey = uuid()
-        let children = this.state.components
+        let components = this.state.practiceComponents
 
         if (this.state.contentType === "exercise") {
-            children[uuidKey] = <ExpandDetails key={uuidKey} title={this.state.contentName} backgroundColor="white"><PracticeDetails title={this.state.contentName} /></ExpandDetails>
+            components[uuidKey] = <ExpandDetails key={uuidKey} title={this.state.contentName} backgroundColor="white"><PracticeDetails title={this.state.contentName} /></ExpandDetails>
 
         } else if (this.state.contentType === "lecture") {
-            children[uuidKey] = <ExpandDetails key={uuidKey} title={this.state.contentName} backgroundColor="#fdfcfa">This is a lecture</ExpandDetails>
+            components[uuidKey] = <ExpandDetails key={uuidKey} title={this.state.contentName} backgroundColor="#fdfcfa">This is a lecture</ExpandDetails>
         }
 
         this.setState({
-            components: children,
-            contentName: ""
+            contentName: "",
+            practiceComponents: components
         })
+
+        this.props.modifyPracticeComponents(components)
     }
 
     createExpandable([key, value]) {
@@ -113,7 +106,7 @@ export default class LessonDetails extends Component {
             <Button style={btn_right_style} onClick={this.handleRemove} value={key} floated="right" color="red" icon="remove circle" size="mini" />
             <Button style={btn_style} onClick={this.handleMoveDown} value={id} floated="right" color="yellow" icon="arrow circle down" size="mini" />
             <Button style={btn_style} onClick={this.handleMoveUp} value={id} floated="right" color="yellow" icon="arrow circle up" size="mini" />
-            {value}
+            {value[0]}
         </div>
     }
 
@@ -160,7 +153,7 @@ export default class LessonDetails extends Component {
 
                 <Accordion style={accordion_style} fluid styled>
                     {
-                        Object.entries(this.state.components).map(this.createExpandable)
+                        Object.entries(this.state.practiceComponents).map(this.createExpandable)
                     }
                 </Accordion>
                 <Button basic color="blue">Save</Button>
@@ -168,3 +161,17 @@ export default class LessonDetails extends Component {
         )
     }
 }
+
+const mapStateToProps = (state) => {
+    return {
+        practiceComponents: state.content.practiceComponents
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        modifyPracticeComponents: (element) => { dispatch(modifyPracticeComponents(element, 'MODIFY_LESSON_COMPONENTS')) }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(LessonDetails)

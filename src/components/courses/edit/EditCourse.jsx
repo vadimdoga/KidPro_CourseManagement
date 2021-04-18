@@ -6,6 +6,12 @@ import PopupDetails from "../../course_components/PopupDetails"
 import HeaderComponent from "../../header/HeaderComponent"
 import ExpandDetails from "../../course_components/ExpandDetails"
 import LessonDetails from "../content_types/LessonDetails"
+import { get_json } from "../../../adapters/auth"
+import {populate_lecture_json, populate_practice_json} from "../../../adapters/content"
+
+//redux
+import { connect } from "react-redux"
+import { modifyLessonComponents, modifyExerciseComponents, modifyQaComponents, modifyPracticeComponents, modifyLectureComponents } from "../../../redux/actions/contentActions"
 
 const gradeOptions = [
     { key: 'grade_1', text: 'Grade I', value: 'grade_1' },
@@ -36,7 +42,7 @@ const btn_right_style = {
     marginRight: "1rem"
 }
 
-export default class EditCourse extends Component {
+class EditCourse extends Component {
     constructor(props) {
         super(props)
 
@@ -50,29 +56,72 @@ export default class EditCourse extends Component {
         this.state = {
             courseName: "",
             courseDescription: "",
-            gradeOption: "",
-            children: [],
+            grade: "",
+            isPublished: false,
+
+            accountType: "",
+            authorID: "",
+
             lessonName: "",
-            components: {}
+            lessonComponents: {}
         }
 
     }
 
     componentDidMount() {
-        const id = this.props.match.params.id;
-        console.log(id)
-
-        let children = this.state.components
-
-        children[uuid()] = <ExpandDetails key={uuid()} title="Division and Multiplication" backgroundColor="#fdfcfa" ><LessonDetails title="Division and Multiplication" /></ExpandDetails>
-        children[uuid()] = <ExpandDetails key={uuid()} title="Introduction to fractions" backgroundColor="#fdfcfa" ><LessonDetails title="Introduction to fractions" /></ExpandDetails>
+        const bJson = get_json()
 
         this.setState({
-            courseName: "Lorem Ipsum",
-            courseDescription: "Lorem Ipsum",
-            gradeOption: "grade_3",
-            components: children
+            courseName: bJson["name"],
+            courseDescription: bJson["description"],
+            grade: bJson["grade"],
+            isPublished: bJson["published"],
+
+            accountType: bJson["type"],
+            authorID: bJson["author_id"],
         })
+
+        const lessons = bJson["lessons"]
+
+        let lessonComponents = this.state.lessonComponents
+        let practiceComponents = this.props.practiceComponents
+        let lectureComponents = this.props.lectureComponents
+        let exerciseComponents = this.props.exerciseComponents
+        let qaComponents = this.props.qaComponents
+
+        lessons.forEach(lesson => {
+            // const lectures = lesson["lectures"]
+            // const lectureValues = populate_lecture_json(lesson["id"], lectures, lectureComponents, exerciseComponents, qaComponents)
+            // lectureComponents = lectureValues.lectureComponents
+            // exerciseComponents = lectureValues.exerciseComponents
+            // qaComponents = lectureValues.qaComponents
+
+            const practices = lesson["practises"]
+            const practiceValues = populate_practice_json(lesson["id"], practices, practiceComponents, exerciseComponents, qaComponents)
+            practiceComponents = practiceValues.practiceComponents
+            exerciseComponents = practiceValues.exerciseComponents
+            qaComponents = practiceValues.qaComponents
+
+            lessonComponents[lesson["id"]] = [
+                <ExpandDetails key={lesson["id"]} title={lesson["name"]} backgroundColor="#fdfcfa" >
+                    <LessonDetails
+                        localPracticeComponents={practiceComponents[lesson["id"]]}
+                        localLectureComponents={lectureComponents}
+                        title={lesson["name"]}
+                    />
+                </ExpandDetails>,
+                {
+                    "name": lesson["name"],
+                    "description": lesson["description"],
+                    "order": lesson["order"]
+                }
+            ]
+        });
+
+        this.props.modifyLessonComponents(lessonComponents)
+        this.props.modifyExerciseComponents(exerciseComponents)
+        this.props.modifyLectureComponents(lectureComponents)
+        this.props.modifyQaComponents(qaComponents)
     }
 
     handleSubmitExit(e) {
@@ -85,11 +134,11 @@ export default class EditCourse extends Component {
         const key = e.currentTarget.value
 
         if (key !== undefined) {
-            const children = this.state.components
-            delete children[key]
+            const components = this.state.lessonComponents
+            delete components[key]
 
             this.setState({
-                components: children
+                lessonComponents: components
             })
         }
     }
@@ -111,23 +160,25 @@ export default class EditCourse extends Component {
     }
 
     handleAddExpandable(e) {
-        let children = this.state.components
-        children[uuid()] = <ExpandDetails key={uuid()} title={this.state.lessonName} backgroundColor="#fdfcfa" ><LessonDetails title={this.state.lessonName} /></ExpandDetails>
+        let components = this.state.lessonComponents
+        components[uuid()] = <ExpandDetails key={uuid()} title={this.state.lessonName} backgroundColor="#fdfcfa" ><LessonDetails title={this.state.lessonName} /></ExpandDetails>
 
         this.setState({
-            components: children,
+            lessonComponents: components,
             lessonName: ""
         })
+
+        this.props.modifyLessonComponents(components)
     }
 
-    createExpandable([key, value]) {
+    createExpandable([key, json_value]) {
         const id = "expandable-list-" + key
-        console.log(id)
+        console.log(this.state.lessonComponents)
         return <div key={id} id={id}>
             <Button style={btn_right_style} onClick={this.handleRemove} value={key} floated="right" color="red" icon="remove circle" size="mini" />
             <Button style={btn_style} onClick={this.handleMoveDown} value={id} floated="right" color="teal" icon="arrow circle down" size="mini" />
             <Button style={btn_style} onClick={this.handleMoveUp} value={id} floated="right" color="teal" icon="arrow circle up" size="mini" />
-            {value}
+            {json_value[0]}
         </div>
     }
 
@@ -155,8 +206,8 @@ export default class EditCourse extends Component {
                                 placeholder='Grades'
                                 search
                                 searchInput={{ id: 'form-select-control-grades' }}
-                                value={this.state.gradeOption}
-                                onChange={e => this.setState({ gradeOption: e.target.value })}
+                                value={this.state.grade}
+                                onChange={e => this.setState({ grade: e.target.value })}
                             />
                         </Form.Group>
                         <Form.Field
@@ -184,7 +235,7 @@ export default class EditCourse extends Component {
 
                     <Accordion style={accordion_style} fluid styled>
                         {
-                            Object.entries(this.state.components).map(this.createExpandable)
+                            Object.entries(this.state.lessonComponents).map(this.createExpandable)
                         }
                     </Accordion>
                 </Segment>
@@ -193,3 +244,24 @@ export default class EditCourse extends Component {
     }
 }
 
+const mapStateToProps = (state) => {
+    return {
+        lessonComponents: state.content.lessonComponents,
+        practiceComponents: state.content.practiceComponents,
+        lectureComponents: state.content.lectureComponents,
+        exerciseComponents: state.content.exerciseComponents,
+        qaComponents: state.content.qaComponents
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        modifyLessonComponents: (element) => { dispatch(modifyLessonComponents(element, 'MODIFY_LESSON_COMPONENTS')) },
+        modifyPracticeComponents: (element) => { dispatch(modifyPracticeComponents(element, 'MODIFY_PRACTICE_COMPONENTS')) },
+        modifyLectureComponents: (element) => { dispatch(modifyLectureComponents(element, 'MODIFY_PRACTICE_COMPONENTS')) },
+        modifyExerciseComponents: (element) => { dispatch(modifyExerciseComponents(element, 'MODIFY_EXERCISE_COMPONENTS')) },
+        modifyQaComponents: (element) => { dispatch(modifyQaComponents(element, 'MODIFY_QA_COMPONENTS')) }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(EditCourse)

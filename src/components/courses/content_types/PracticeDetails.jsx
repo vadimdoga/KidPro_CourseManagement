@@ -4,12 +4,17 @@ import { v4 as uuid } from "uuid"
 
 import ExerciseModal from "./ExerciseModal"
 
+//redux
+import { connect } from "react-redux"
+import { modifyExerciseComponents} from "../../../redux/actions/contentActions"
+import { modifyModalState, modifyModalID } from '../../../redux/actions/modalActions'
+
 const exercises_style = {
     width: "50%",
     margin: "1rem auto"
 }
 
-export default class PracticeDetails extends Component {
+class PracticeDetails extends Component {
     constructor(props) {
         super(props)
 
@@ -18,42 +23,24 @@ export default class PracticeDetails extends Component {
         this.handleRemove = this.handleRemove.bind(this)
         this.handleMoveUp = this.handleMoveUp.bind(this)
         this.handleMoveDown = this.handleMoveDown.bind(this)
+        this.handleModalClick = this.handleModalClick.bind(this)
 
         this.state = {
             practiceName: this.props.title,
             practiceDescription: "",
-            components: {}
+            exerciseComponents: this.props.exerciseComponents[this.props.practiceID]
         }
-    }
-
-    componentDidMount() {
-        const uuidKey = uuid()
-        let children = this.state.components
-
-        children[uuidKey] = {
-            "html": <span>test</span>,
-            "json": {
-                contentQuestion: "test",
-                contentAnswers: {"key": {"answer": "hey", "is_valid": true}},
-                speech_2_text: false,
-                image_blob: undefined
-            }
-        }
-
-        this.setState({
-            components: children
-        })
     }
 
     handleRemove(e) {
         const key = e.currentTarget.value
 
         if (key !== undefined) {
-            const children = this.state.components
-            delete children[key]
+            const components = this.state.exerciseComponents
+            delete components[key]
 
             this.setState({
-                components: children
+                exerciseComponents: components
             })
         }
     }
@@ -74,20 +61,36 @@ export default class PracticeDetails extends Component {
                 element.parentNode.insertBefore(element.nextElementSibling, element);
     }
 
-    handleAddContent(e, exerciseDetails) {
-        console.log(exerciseDetails)
+    handleAddContent(e) {
         const uuidKey = uuid()
-        let components = this.state.components
+
+        const practiceDetails = {
+            "html": "",
+            "json": {
+                "qaComponents": this.props.qaComponents,
+                "practiceName": this.state.practiceName,
+                "practiceDescription": this.state.practiceDescription
+            }
+        }
+
+        let components = this.state.exerciseComponents
 
         components[uuidKey] = {
-            "html": <span>{ exerciseDetails["contentQuestion"] }</span>,
-            "json": exerciseDetails
+            "html": <span>{ practiceDetails["json"]["qaComponents"]["contentQuestion"] }</span>,
+            "json": practiceDetails["json"]
         }
 
         this.setState({
-            components: components,
-            contentName: ""
+            exerciseComponents: components
         })
+
+        this.props.modifyExerciseComponents(components)
+    }
+
+    handleModalClick(e, key) {
+        console.log(key)
+        this.props.modifyModalState(true)
+        this.props.modifyModalID(key)
     }
 
     createExpandable([key, value]) {
@@ -96,7 +99,8 @@ export default class PracticeDetails extends Component {
             <Button onClick={this.handleRemove} value={key} floated="right" color="red" icon="remove circle" size="mini" />
             <Button onClick={this.handleMoveDown} value={id} floated="right" color="green" icon="arrow circle down" size="mini" />
             <Button onClick={this.handleMoveUp} value={id} floated="right" color="green" icon="arrow circle up" size="mini" />
-            {value["html"]}
+            <span onClick={(e) => this.handleModalClick(e, key)}>{value[0]}</span>
+            {this.props.isOpen ? <ExerciseModal practiceHandleSave={this.handleAddContent} /> : ""}
         </Segment>
     }
 
@@ -111,7 +115,7 @@ export default class PracticeDetails extends Component {
                         placeholder='Multiplication with 2'
                         width={12}
                         value={this.state.practiceName}
-                        onChange={e => this.setState({ practiceName: e.target.value })}
+                        onChange={e => this.setState({practiceName: e.target.value})}
                     />
 
                     <Form.Field
@@ -121,19 +125,37 @@ export default class PracticeDetails extends Component {
                         placeholder='Practice description'
                         value={this.state.practiceDescription}
                         selection
-                        onChange={e => this.setState({ practiceDescription: e.target.value })}
+                        onChange={e => this.setState({practiceDescription: e.target.value})}
                     />
                 </Form>
                 <br />
                 <span style={{ fontWeight: "bold", margin: "1rem" }}>Add Exercise</span>
-                <ExerciseModal practiceHandleSave={this.handleAddContent} />
+                <Button style={{ marginLeft: "1rem" }} circular size="small" color="green" icon='plus circle' />
 
                 <Segment.Group style={exercises_style}>
                     {
-                        Object.entries(this.state.components).map(this.createExpandable)
+                        Object.entries(this.state.exerciseComponents).map(this.createExpandable)
                     }
                 </Segment.Group>
             </div>
         )
     }
 }
+
+const mapStateToProps = (state) => {
+    return {
+        exerciseComponents: state.content.exerciseComponents,
+        qaComponents: state.content.qaComponents,
+        isOpen: state.modal.modalIsOpen
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        modifyExerciseComponents: (element) => { dispatch(modifyExerciseComponents(element, 'MODIFY_PRACTICE_COMPONENTS')) },
+        modifyModalState: (element) => { dispatch(modifyModalState(element, 'MODIFY_MODAL_STATE')) },
+        modifyModalID: (element) => { dispatch(modifyModalID(element, 'MODIFY_MODAL_ID')) },
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(PracticeDetails)
