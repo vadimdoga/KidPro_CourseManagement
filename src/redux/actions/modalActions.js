@@ -5,3 +5,9 @@ export const modifyModalState = (element, type) => {
     }
 }
 
+export const modifyModalID = (element, type) => {
+    return {
+        type,
+        element
+    }
+}
