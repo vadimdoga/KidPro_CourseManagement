@@ -13,3 +13,9 @@
 //   const axios = returnAxiosInstance();
 //   return axios.post(url, requestData);
 // }
+
+export function get_json() {
+    const jsonData = require("./mock_back.json")
+
+    return JSON.parse(JSON.stringify(jsonData))
+}
