@@ -11,3 +11,10 @@ export const modifyModalID = (element, type) => {
         element
     }
 }
+
+export const modifyModalData = (element, type) => {
+    return {
+        type,
+        element
+    }
+}
