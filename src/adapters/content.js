@@ -89,8 +89,7 @@ export function populate_practice_json(lessonID, practices, practiceComponents, 
                     "speech_to_text": exercise["speech_to_text"],
                     "order": exercise["order"],
                     "images": exercise["images"],
-                    "question": exercise["question"],
-                    "start_time": exercise["start_time"],
+                    "question": exercise["question"]
                 }
             ]
 
