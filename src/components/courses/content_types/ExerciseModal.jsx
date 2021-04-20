@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Form, Button, Segment, Checkbox, Modal } from 'semantic-ui-react'
+import { Form, Button, Segment, Checkbox, Modal, Image } from 'semantic-ui-react'
 import { v4 as uuid } from "uuid"
 
 //redux
@@ -29,23 +29,19 @@ class ExerciseModal extends Component {
         this.handleSave = this.handleSave.bind(this)
 
         this.state = {
-            contentQuestion: "",
+            contentQuestion: this.props.modalData["question"],
             contentAnswer: "",
-            contentAnswers: {},
-            speech_2_text: false,
-            image_blob: undefined,
+            speech_2_text: this.props.modalData["speech_to_text"],
+            images: this.props.modalData["images"],
 
             qaComponents: this.props.qaComponents[this.props.modalID]
         }
-
-        console.log(this.props.modalID)
     }
 
     handleModalClose(e) {
         this.setState({
             contentQuestion: "",
             contentAnswer: "",
-            contentAnswers: {},
             speech_2_text: false,
             image_blob: undefined
         })
@@ -82,18 +78,18 @@ class ExerciseModal extends Component {
 
     makeExerciseValid(e) {
         const key = e.currentTarget.getAttribute('json_key')
-        const contentAnswer = this.state.contentAnswers
+        let contentAnswer = this.state.qaComponents
 
-        contentAnswer[key]["is_valid"] = !contentAnswer[key]["is_valid"]
+        contentAnswer[key][1]["is_valid"] = !contentAnswer[key][1]["is_valid"]
 
         this.setState({
-            contentAnswer: contentAnswer
+            qaComponents: contentAnswer
         })
 
     }
 
     fileChange = (e) => {
-        this.setState({ image_blob: e.target.files[0] }, () => {
+        this.setState({ images: [...this.state.images, e.target.files[0]] }, () => {
             console.log("File chosen --->", this.state.image_blob);
         })
     }
@@ -116,24 +112,22 @@ class ExerciseModal extends Component {
         const components = this.state.qaComponents
         const key = uuid()
 
-        const newAnswer = {
-            "html": <span>{this.state.contentAnswer}</span>,
-            "json": {
+        const newAnswer = [
+            <span>{this.state.contentAnswer}</span>,
+            {
                 "answer": this.state.contentAnswer,
                 "is_valid": false,
-                "answers": this.state.contentAnswers,
                 "speech_2_text": this.state.speech_2_text,
-                "image_blob": this.state.image_blob
+                "images": this.state.images
             }
-        }
+        ]
 
         components[key] = newAnswer
 
         this.setState({
             contentAnswer: "",
-            contentAnswers: {},
             speech_2_text: false,
-            image_blob: undefined,
+            images: undefined,
             qaComponents: components
         })
     }
@@ -141,8 +135,6 @@ class ExerciseModal extends Component {
     handleSave(e) {
         this.props.modifyModalState(false)
         this.props.modifyQaComponents(this.state.qaComponents)
-
-        this.props.practiceHandleSave(e)
     }
 
     render() {
@@ -174,6 +166,13 @@ class ExerciseModal extends Component {
                             onChange={this.fileChange}
                         />
                     </Form.Field>
+                    <Image.Group size="tiny">
+                        {
+                            this.state.images.map((image) => {
+                                return <Image src={image} />
+                            })
+                        }
+                    </Image.Group>
                     <Form.Group>
                         <Form.Input
                             fluid
@@ -191,7 +190,8 @@ class ExerciseModal extends Component {
 
                     <Form.Field
                         control={Checkbox}
-                        onClick={() => this.setState({ speech_2_text: !this.state.speech_2_text })}
+                        checked={this.state.speech_2_text}
+                        onChange={() => this.setState({ speech_2_text: !this.state.speech_2_text })}
                         label={<label>Use speech to text feature?</label>}
                     />
                 </Modal.Content>
@@ -211,7 +211,8 @@ const mapStateToProps = (state) => {
     return {
         qaComponents: state.content.qaComponents,
         isOpen: state.modal.modalIsOpen,
-        modalID: state.modal.modalID
+        modalID: state.modal.modalID,
+        modalData: state.modal.modalData
     }
 }
 
