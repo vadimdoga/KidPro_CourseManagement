@@ -109,32 +109,37 @@ class ExerciseModal extends Component {
     }
 
     handleAddExercise(e) {
-        const components = this.state.qaComponents
-        const key = uuid()
-
-        const newAnswer = [
+        const newKey = uuid()
+        let components = this.state.qaComponents
+        components[newKey] = [
             <span>{this.state.contentAnswer}</span>,
             {
                 "answer": this.state.contentAnswer,
-                "is_valid": false,
-                "speech_2_text": this.state.speech_2_text,
-                "images": this.state.images
+                "is_valid": this.state.is_valid
             }
         ]
-
-        components[key] = newAnswer
 
         this.setState({
             contentAnswer: "",
             speech_2_text: false,
-            images: undefined,
+            images: [],
             qaComponents: components
         })
     }
 
     handleSave(e) {
+        const components = this.props.qaComponents
+
+        components[this.props.modalID] = this.state.qaComponents
+
         this.props.modifyModalState(false)
-        this.props.modifyQaComponents(this.state.qaComponents)
+        this.props.modifyQaComponents(components)
+
+        this.props.saveExerciseComponent(e, {
+            "contentQuestion": this.state.contentQuestion,
+            "speech_2_text": this.state.speech_2_text,
+            "images": this.state.images,
+        })
     }
 
     render() {
