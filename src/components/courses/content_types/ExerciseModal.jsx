@@ -5,7 +5,7 @@ import { v4 as uuid } from "uuid"
 //redux
 import { connect } from "react-redux"
 import { modifyQaComponents } from "../../../redux/actions/contentActions"
-import { modifyModalState } from "../../../redux/actions/modalActions"
+import { modifyModalState, modifyModalTag } from "../../../redux/actions/modalActions"
 
 const exercises_style = {
     width: "50%",
@@ -29,9 +29,9 @@ class ExerciseModal extends Component {
         this.handleSave = this.handleSave.bind(this)
 
         this.state = {
-            contentQuestion: this.props.modalData["question"],
+            question: this.props.modalData["question"],
             contentAnswer: "",
-            speech_2_text: this.props.modalData["speech_to_text"],
+            speech_2_text: this.props.modalData["speech_2_text"],
             images: this.props.modalData["images"],
 
             qaComponents: this.props.qaComponents[this.props.modalID]
@@ -40,7 +40,7 @@ class ExerciseModal extends Component {
 
     handleModalClose(e) {
         this.setState({
-            contentQuestion: "",
+            question: "",
             contentAnswer: "",
             speech_2_text: false,
             image_blob: undefined
@@ -136,7 +136,7 @@ class ExerciseModal extends Component {
         this.props.modifyQaComponents(components)
 
         this.props.saveExerciseComponent(e, {
-            "contentQuestion": this.state.contentQuestion,
+            "question": this.state.question,
             "speech_2_text": this.state.speech_2_text,
             "images": this.state.images,
         })
@@ -147,15 +147,18 @@ class ExerciseModal extends Component {
             <Modal
                 closeIcon
                 as={Form}
-                onClose={() => this.props.modifyModalState(false)}
+                onClose={() => {
+                    this.props.modifyModalState(false)
+                    modifyModalTag(null)
+                }}
                 open={this.props.isOpen}
             >
                 <Modal.Header>Configure Exercise</Modal.Header>
                 <Modal.Content>
                     <Form.Input
                         fluid
-                        onChange={e => this.setState({ contentQuestion: e.target.value })}
-                        value={this.state.contentQuestion}
+                        onChange={e => this.setState({ question: e.target.value })}
+                        value={this.state.question}
                         label="Provide a question" />
                     <Form.Field>
                         <Button
@@ -224,7 +227,8 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
     return {
         modifyQaComponents: (element) => { dispatch(modifyQaComponents(element, 'MODIFY_QA_COMPONENTS')) },
-        modifyModalState: (element) => { dispatch(modifyModalState(element, 'MODIFY_MODAL_STATE')) }
+        modifyModalState: (element) => { dispatch(modifyModalState(element, 'MODIFY_MODAL_STATE')) },
+        modifyModalTag: (element) => { dispatch(modifyModalTag(element, 'MODIFY_MODAL_TAG')) },
     }
 }
 

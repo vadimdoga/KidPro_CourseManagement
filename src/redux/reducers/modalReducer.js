@@ -1,6 +1,7 @@
 const initState = {
     modalIsOpen: false,
     modalId: "",
+    modalTag: null,
     modalData: {}
 }
 
@@ -25,6 +26,13 @@ const modalReducer = (state = initState, action) => {
         return {
             ...state,
             modalData: newModalData
+        }
+    } else if (action.type === 'MODIFY_MODAL_TAG') {
+        const newModalTag = action.element
+
+        return {
+            ...state,
+            modalTag: newModalTag
         }
     }
 

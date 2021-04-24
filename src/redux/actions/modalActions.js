@@ -18,3 +18,10 @@ export const modifyModalData = (element, type) => {
         element
     }
 }
+
+export const modifyModalTag = (element, type) => {
+    return {
+        type,
+        element
+    }
+}

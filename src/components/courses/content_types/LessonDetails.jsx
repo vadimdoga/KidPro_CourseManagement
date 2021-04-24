@@ -7,7 +7,7 @@ import { v4 as uuid } from "uuid"
 
 //redux
 import { connect } from "react-redux"
-import { modifyPracticeComponents } from "../../../redux/actions/contentActions"
+import { modifyPracticeComponents, modifyExerciseComponents } from "../../../redux/actions/contentActions"
 
 
 const accordion_style = {
@@ -41,12 +41,13 @@ class LessonDetails extends Component {
         this.handleRemove = this.handleRemove.bind(this)
         this.handleMoveUp = this.handleMoveUp.bind(this)
         this.handleMoveDown = this.handleMoveDown.bind(this)
+        this.saveLesson = this.saveLesson.bind(this)
 
         this.state = {
             lessonName: this.props.title,
             lessonDescription: "",
-            contentType: "",
-            contentName: "",
+            practiceType: "",
+            practiceName: "",
             practiceComponents: this.props.localPracticeComponents
         }
 
@@ -81,23 +82,44 @@ class LessonDetails extends Component {
                 element.parentNode.insertBefore(element.nextElementSibling, element);
     }
 
+    saveLesson(e) {
+        console.log("Request save lesson")
+        console.log("")
+    }
+
     handleAddContent(e) {
         const uuidKey = uuid()
         let components = this.state.practiceComponents
 
-        if (this.state.contentType === "exercise") {
-            components[uuidKey] = <ExpandDetails key={uuidKey} title={this.state.contentName} backgroundColor="white"><PracticeDetails title={this.state.contentName} /></ExpandDetails>
+        if (this.state.practiceType === "exercise") {
+            components[uuidKey] = [
+                <ExpandDetails key={uuidKey} title={this.state.practiceName} backgroundColor="white">
+                    <PracticeDetails practiceID={uuidKey} title={this.state.practiceName} />
+                </ExpandDetails>,
+                {}
+            ]
 
-        } else if (this.state.contentType === "lecture") {
-            components[uuidKey] = <ExpandDetails key={uuidKey} title={this.state.contentName} backgroundColor="#fdfcfa">This is a lecture</ExpandDetails>
+        } else if (this.state.practiceType === "lecture") {
+            components[uuidKey] = [
+                <ExpandDetails key={uuidKey} title={this.state.practiceName} backgroundColor="#fdfcfa">
+                    This is a lecture
+                </ExpandDetails>,
+                {}
+            ]
         }
 
+        const exerciseComponents = this.props.exerciseComponents
+
+        exerciseComponents[uuidKey] = []
+
         this.setState({
-            contentName: "",
+            practiceName: "",
             practiceComponents: components
         })
 
         this.props.modifyPracticeComponents(components)
+
+        this.props.modifyExerciseComponents(exerciseComponents)
     }
 
     createExpandable([key, value]) {
@@ -140,14 +162,14 @@ class LessonDetails extends Component {
                     search
                     options={contentOptions}
                     selection
-                    onChange={(e, data) => this.setState({ contentType: data.value })}
-                    value={this.state.contentType}
+                    onChange={(e, data) => this.setState({ practiceType: data.value })}
+                    value={this.state.practiceType}
                 />
                 <PopupDetails
                     btnColor="yellow"
                     onClickFnc={this.handleAddContent}
                     content={
-                        <Input onChange={e => this.setState({ contentName: e.target.value })} value={this.state.contentName} style={{ marginBottom: "1rem" }} placeholder='Content Name' />
+                        <Input onChange={e => this.setState({ practiceName: e.target.value })} value={this.state.practiceName} style={{ marginBottom: "1rem" }} placeholder='Content Name' />
                     }
                 />
 
@@ -156,7 +178,7 @@ class LessonDetails extends Component {
                         Object.entries(this.state.practiceComponents).map(this.createExpandable)
                     }
                 </Accordion>
-                <Button basic color="blue">Save</Button>
+                <Button onClick={this.saveLesson} basic color="blue">Save</Button>
             </div>
         )
     }
@@ -164,13 +186,15 @@ class LessonDetails extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        practiceComponents: state.content.practiceComponents
+        practiceComponents: state.content.practiceComponents,
+        exerciseComponents: state.content.exerciseComponents,
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        modifyPracticeComponents: (element) => { dispatch(modifyPracticeComponents(element, 'MODIFY_LESSON_COMPONENTS')) }
+        modifyPracticeComponents: (element) => { dispatch(modifyPracticeComponents(element, 'MODIFY_LESSON_COMPONENTS')) },
+        modifyExerciseComponents: (element) => { dispatch(modifyExerciseComponents(element, 'MODIFY_PRACTICE_COMPONENTS')) },
     }
 }
 

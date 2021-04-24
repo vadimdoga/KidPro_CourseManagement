@@ -6,8 +6,8 @@ import ExerciseModal from "./ExerciseModal"
 
 //redux
 import { connect } from "react-redux"
-import { modifyExerciseComponents, modifyQaComponents, modifyPracticeComponents } from "../../../redux/actions/contentActions"
-import { modifyModalState, modifyModalID, modifyModalData } from '../../../redux/actions/modalActions'
+import { modifyExerciseComponents, modifyQaComponents } from "../../../redux/actions/contentActions"
+import { modifyModalState, modifyModalID, modifyModalData, modifyModalTag } from '../../../redux/actions/modalActions'
 
 const exercises_style = {
     width: "50%",
@@ -69,35 +69,32 @@ class PracticeDetails extends Component {
 
 
         exerciseComponents[this.props.modalID] = [
-            <span>{ exerciseDetails["contentQuestion"] }</span>,
+            <span>{ exerciseDetails["question"] }</span>,
             exerciseDetails
         ]
 
         this.setState({
-            exerciseComponents: exerciseComponents,
-            modalTag: null
+            exerciseComponents: exerciseComponents
         })
 
         this.props.modifyExerciseComponents(exerciseComponents)
     }
 
     handleModalClick(e, key, data) {
-        console.log(key)
         this.props.modifyModalState(true)
         this.props.modifyModalID(key)
         this.props.modifyModalData(data)
 
-        this.setState({
-            modalTag: <ExerciseModal saveExerciseComponent={this.saveExerciseComponent} />
-        })
+        this.props.modifyModalTag(<ExerciseModal saveExerciseComponent={this.saveExerciseComponent} />)
     }
 
     handleBtnClick(e) {
         const newKey = uuid()
         const components = this.props.qaComponents
         components[newKey] = {}
-        this.props.modifyQaComponents(components)
+        console.log("State " + this.props.isOpen)
         this.props.modifyModalState(true)
+        this.props.modifyQaComponents(components)
         this.props.modifyModalID(newKey)
         this.props.modifyModalData({
             "question": "",
@@ -105,9 +102,7 @@ class PracticeDetails extends Component {
             "images": []
         })
 
-        this.setState({
-            modalTag: <ExerciseModal saveExerciseComponent={this.saveExerciseComponent} />
-        })
+        this.props.modifyModalTag(<ExerciseModal saveExerciseComponent={this.saveExerciseComponent} />)
     }
 
     createExpandable([key, value]) {
@@ -117,7 +112,7 @@ class PracticeDetails extends Component {
             <Button onClick={this.handleMoveDown} value={id} floated="right" color="green" icon="arrow circle down" size="mini" />
             <Button onClick={this.handleMoveUp} value={id} floated="right" color="green" icon="arrow circle up" size="mini" />
             <span style={{ cursor: "pointer" }} onClick={(e) => this.handleModalClick(e, key, value[1])}>{value[0]}</span>
-            {this.props.isOpen ? this.state.modalTag : null}
+            {this.props.isOpen ? this.props.modalTag : null}
         </Segment>
     }
 
@@ -163,8 +158,8 @@ const mapStateToProps = (state) => {
     return {
         exerciseComponents: state.content.exerciseComponents,
         qaComponents: state.content.qaComponents,
-        practiceComponents: state.content.practiceComponents,
         isOpen: state.modal.modalIsOpen,
+        modalTag: state.modal.modalTag,
         modalID: state.modal.modalID,
     }
 }
@@ -173,10 +168,10 @@ const mapDispatchToProps = (dispatch) => {
     return {
         modifyExerciseComponents: (element) => { dispatch(modifyExerciseComponents(element, 'MODIFY_PRACTICE_COMPONENTS')) },
         modifyQaComponents: (element) => { dispatch(modifyQaComponents(element, 'MODIFY_QA_COMPONENTS')) },
-        modifyPracticeComponents: (element) => { dispatch(modifyPracticeComponents(element, 'MODIFY_LESSON_COMPONENTS')) },
         modifyModalState: (element) => { dispatch(modifyModalState(element, 'MODIFY_MODAL_STATE')) },
         modifyModalID: (element) => { dispatch(modifyModalID(element, 'MODIFY_MODAL_ID')) },
         modifyModalData: (element) => { dispatch(modifyModalData(element, 'MODIFY_MODAL_DATA')) },
+        modifyModalTag: (element) => { dispatch(modifyModalTag(element, 'MODIFY_MODAL_TAG')) },
     }
 }
 

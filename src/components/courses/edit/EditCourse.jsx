@@ -7,7 +7,7 @@ import HeaderComponent from "../../header/HeaderComponent"
 import ExpandDetails from "../../course_components/ExpandDetails"
 import LessonDetails from "../content_types/LessonDetails"
 import { get_json } from "../../../adapters/auth"
-import {populate_lecture_json, populate_practice_json} from "../../../adapters/content"
+import { populate_lecture_json, populate_practice_json } from "../../../adapters/content"
 
 //redux
 import { connect } from "react-redux"
@@ -161,7 +161,21 @@ class EditCourse extends Component {
 
     handleAddExpandable(e) {
         let components = this.state.lessonComponents
-        components[uuid()] = <ExpandDetails key={uuid()} title={this.state.lessonName} backgroundColor="#fdfcfa" ><LessonDetails title={this.state.lessonName} /></ExpandDetails>
+        const uuidKey = uuid()
+        components[uuidKey] = [
+            <ExpandDetails key={uuidKey} title={this.state.lessonName} backgroundColor="#fdfcfa" >
+                <LessonDetails
+                    localPracticeComponents={{}}
+                    localLectureComponents={{}}
+                    title={this.state.lessonName}
+                />
+            </ExpandDetails>,
+            {
+                "name": this.state.lessonName,
+                "description": "",
+                "order": 0
+            }
+        ]
 
         this.setState({
             lessonComponents: components,
@@ -172,8 +186,8 @@ class EditCourse extends Component {
     }
 
     createExpandable([key, json_value]) {
-        const id = "expandable-list-" + key
         console.log(this.state.lessonComponents)
+        const id = "expandable-list-" + key
         return <div key={id} id={id}>
             <Button style={btn_right_style} onClick={this.handleRemove} value={key} floated="right" color="red" icon="remove circle" size="mini" />
             <Button style={btn_style} onClick={this.handleMoveDown} value={id} floated="right" color="teal" icon="arrow circle down" size="mini" />
