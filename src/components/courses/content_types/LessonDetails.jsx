@@ -91,7 +91,7 @@ class LessonDetails extends Component {
         console.log(lessons)
 
         console.log("Practices")
-        console.log(this.props.practiceComponents[this.props.lessonID])
+        console.log(this.props.practiceComponents)
 
         // const jsonPractices = prepare_practice_components(
         //     this.props.practiceComponents[this.props.lessonID],
@@ -153,7 +153,10 @@ class LessonDetails extends Component {
             practiceComponents: components
         })
 
-        this.props.modifyPracticeComponents(components)
+        const practiceGlobalComponents = this.props.practiceComponents
+        practiceGlobalComponents[this.props.lessonID] = components
+
+        this.props.modifyPracticeComponents(practiceGlobalComponents)
         this.props.modifyExerciseComponents(exerciseComponents)
     }
 
