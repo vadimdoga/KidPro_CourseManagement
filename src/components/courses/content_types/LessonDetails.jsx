@@ -3,7 +3,7 @@ import { Button, Form, Input, Accordion, Dropdown, TextArea } from 'semantic-ui-
 import ExpandDetails from "../../course_components/ExpandDetails"
 import PracticeDetails from "./PracticeDetails"
 import PopupDetails from "../../course_components/PopupDetails"
-import {prepare_practice_components} from "../../../adapters/content"
+import { prepare_practice_components } from "../../../adapters/content"
 import { v4 as uuid } from "uuid"
 
 //redux
@@ -68,19 +68,47 @@ class LessonDetails extends Component {
     }
 
     handleMoveUp(e) {
-        const element = document.querySelector("#" + e.currentTarget.value)
+        const el_id = e.currentTarget.getAttribute('el_id')
+        const element = document.querySelector("#" + el_id)
 
         if (element !== undefined)
-            if (element.previousElementSibling)
-                element.parentNode.insertBefore(element, element.previousElementSibling);
+            if (element.previousElementSibling) {
+                const previousID = element.previousElementSibling.getAttribute('id').replace("expandable-practice-list-", "")
+
+                const currentID = e.currentTarget.value
+                const practiceComponents = this.state.practiceComponents
+
+                practiceComponents[currentID][1]["order"] -= 1
+                practiceComponents[previousID][1]["order"] += 1
+
+                this.setState({ practiceComponents: practiceComponents })
+
+                const globalPracticeComponents = this.props.practiceComponents
+                globalPracticeComponents[this.props.lessonID] = practiceComponents
+                this.props.modifyPracticeComponents(globalPracticeComponents)
+            }
     }
 
     handleMoveDown(e) {
-        const element = document.querySelector("#" + e.currentTarget.value)
+        const el_id = e.currentTarget.getAttribute('el_id')
+        const element = document.querySelector("#" + el_id)
 
         if (element !== undefined)
-            if (element.nextElementSibling)
-                element.parentNode.insertBefore(element.nextElementSibling, element);
+            if (element.nextElementSibling) {
+                const nextID = element.nextElementSibling.getAttribute('id').replace("expandable-practice-list-", "")
+
+                const currentID = e.currentTarget.value
+                const practiceComponents = this.state.practiceComponents
+
+                practiceComponents[currentID][1]["order"] += 1
+                practiceComponents[nextID][1]["order"] -= 1
+
+                this.setState({ practiceComponents: practiceComponents })
+
+                const globalPracticeComponents = this.props.practiceComponents
+                globalPracticeComponents[this.props.lessonID] = practiceComponents
+                this.props.modifyPracticeComponents(globalPracticeComponents)
+            }
     }
 
     saveLesson(e) {
@@ -152,14 +180,27 @@ class LessonDetails extends Component {
         this.props.modifyExerciseComponents(exerciseComponents)
     }
 
+    orderContent() {
+        const arr = Object.entries(this.state.practiceComponents).map(this.createExpandable)
+
+        arr.sort((x, y) => {
+            return ((x["order"] < y["order"]) ? -1 : ((x["order"] > y["order"]) ? 1 : 0))
+        })
+
+        return arr.map(value => value["content"])
+    }
+
     createExpandable([key, value]) {
-        const id = "expandable-list-" + uuid()
-        return <div key={id} id={id}>
+        const id = "expandable-practice-list-" + key
+        const content = <div key={id} id={id}>
             <Button style={btn_right_style} onClick={this.handleRemove} value={key} floated="right" color="red" icon="remove circle" size="mini" />
-            <Button style={btn_style} onClick={this.handleMoveDown} value={id} floated="right" color="yellow" icon="arrow circle down" size="mini" />
-            <Button style={btn_style} onClick={this.handleMoveUp} value={id} floated="right" color="yellow" icon="arrow circle up" size="mini" />
+            <Button style={btn_style} onClick={this.handleMoveDown} value={key} el_id={id} floated="right" color="yellow" icon="arrow circle down" size="mini" />
+            <Button style={btn_style} onClick={this.handleMoveUp} value={key} el_id={id} floated="right" color="yellow" icon="arrow circle up" size="mini" />
             {value[0]}
         </div>
+
+        return { "content": content, "order": value[1]["order"] }
+
     }
 
     render() {
@@ -205,7 +246,7 @@ class LessonDetails extends Component {
 
                 <Accordion style={accordion_style} fluid styled>
                     {
-                        Object.entries(this.state.practiceComponents).map(this.createExpandable)
+                        this.orderContent()
                     }
                 </Accordion>
                 <Button onClick={this.saveLesson} basic color="blue">Save</Button>
