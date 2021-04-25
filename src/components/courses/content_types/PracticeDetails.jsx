@@ -51,19 +51,47 @@ class PracticeDetails extends Component {
     }
 
     handleMoveUp(e) {
-        const element = document.querySelector("#" + e.currentTarget.value)
+        const el_id = e.currentTarget.getAttribute('el_id')
+        const element = document.querySelector("#" + el_id)
 
         if (element !== undefined)
-            if (element.previousElementSibling)
-                element.parentNode.insertBefore(element, element.previousElementSibling);
+            if (element.previousElementSibling) {
+                const previousID = element.previousElementSibling.getAttribute('id').replace("expandable-exercise-list-", "")
+
+                const currentID = e.currentTarget.value
+                const exerciseComponents = this.state.exerciseComponents
+
+                exerciseComponents[currentID][1]["order"] -= 1
+                exerciseComponents[previousID][1]["order"] += 1
+
+                this.setState({ exerciseComponents: exerciseComponents })
+
+                const globalExerciseComponents = this.props.exerciseComponents
+                globalExerciseComponents[this.props.practiceID] = exerciseComponents
+                this.props.modifyExerciseComponents(globalExerciseComponents)
+            }
     }
 
     handleMoveDown(e) {
-        const element = document.querySelector("#" + e.currentTarget.value)
+        const el_id = e.currentTarget.getAttribute('el_id')
+        const element = document.querySelector("#" + el_id)
 
         if (element !== undefined)
-            if (element.nextElementSibling)
-                element.parentNode.insertBefore(element.nextElementSibling, element);
+            if (element.nextElementSibling) {
+                const nextID = element.nextElementSibling.getAttribute('id').replace("expandable-exercise-list-", "")
+
+                const currentID = e.currentTarget.value
+                const exerciseComponents = this.state.exerciseComponents
+
+                exerciseComponents[currentID][1]["order"] += 1
+                exerciseComponents[nextID][1]["order"] -= 1
+
+                this.setState({ exerciseComponents: exerciseComponents })
+
+                const globalExerciseComponents = this.props.exerciseComponents
+                globalExerciseComponents[this.props.practiceID] = exerciseComponents
+                this.props.modifyExerciseComponents(globalExerciseComponents)
+            }
     }
 
     saveExerciseComponent(e, exerciseDetails) {
@@ -113,15 +141,27 @@ class PracticeDetails extends Component {
         this.props.modifyModalTag(<ExerciseModal saveExerciseComponent={this.saveExerciseComponent} />)
     }
 
+    orderContent() {
+        const arr = Object.entries(this.state.exerciseComponents).map(this.createExpandable)
+
+        arr.sort((x, y) => {
+            return ((x["order"] < y["order"]) ? -1 : ((x["order"] > y["order"]) ? 1 : 0))
+        })
+
+        return arr.map(value => value["content"])
+    }
+
     createExpandable([key, value]) {
-        const id = "expandable-list-" + uuid()
-        return <Segment style={{ padding: "1rem" }} key={id} id={id}>
+        const id = "expandable-exercise-list-" + key
+        const content = <Segment style={{ padding: "1rem" }} key={id} id={id}>
             <Button onClick={this.handleRemove} value={key} floated="right" color="red" icon="remove circle" size="mini" />
-            <Button onClick={this.handleMoveDown} value={id} floated="right" color="green" icon="arrow circle down" size="mini" />
-            <Button onClick={this.handleMoveUp} value={id} floated="right" color="green" icon="arrow circle up" size="mini" />
+            <Button onClick={this.handleMoveDown} value={key} el_id={id} floated="right" color="green" icon="arrow circle down" size="mini" />
+            <Button onClick={this.handleMoveUp} value={key} el_id={id} floated="right" color="green" icon="arrow circle up" size="mini" />
             <span style={{ cursor: "pointer" }} onClick={(e) => this.handleModalClick(e, key, value[1])}>{value[0]}</span>
             {this.props.isOpen ? this.props.modalTag : null}
         </Segment>
+
+        return { "content": content, "order": value[1]["order"] }
     }
 
     onTypingDescription(e) {
@@ -194,7 +234,7 @@ class PracticeDetails extends Component {
 
                 <Segment.Group style={exercises_style}>
                     {
-                        Object.entries(this.state.exerciseComponents).map(this.createExpandable)
+                        this.orderContent()
                     }
                 </Segment.Group>
             </div>
