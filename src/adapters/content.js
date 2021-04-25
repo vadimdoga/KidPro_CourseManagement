@@ -114,3 +114,54 @@ export function populate_practice_json(lessonID, practices, practiceComponents, 
         "qaComponents": qaComponents
     }
 }
+
+
+export function prepare_practice_components(practiceComponents, exerciseComponents, qaComponents) {
+    const jsonPractices = []
+    const practices = practiceComponents
+
+    Object.entries(practices).forEach(([practice_key, practice_value]) => {
+        const exercises = exerciseComponents[practice_key]
+        const jsonExercises = []
+
+        Object.entries(exercises).forEach(([exercise_key, exercise_value]) => {
+            const answers = qaComponents[exercise_key]
+            const jsonAnswers = []
+
+            Object.entries(answers).forEach(([answer_key, answer_value]) => {
+                const answerJson = {
+                    "id": answer_key,
+                    "answer": answer_value[1]["answer"],
+                    "is_Right": answer_value[1]["isOpen"],
+                    "order": answer_value[1]["order"]
+                }
+
+                jsonAnswers.push(answerJson)
+            })
+
+            const exerciseJson = {
+                "id": exercise_key,
+                "speech_to_text": exercise_value[1]["speech_to_text"],
+                "order": exercise_value[1]["order"],
+                "images": exercise_value[1]["images"],
+                "question": exercise_value[1]["question"],
+                "start_time": null,
+                "answers": jsonAnswers
+            }
+
+            jsonExercises.push(exerciseJson)
+        })
+
+        const practiceJson = {
+            "id": practice_key,
+            "name": practice_value[1]["name"],
+            "order": practice_value[1]["order"],
+            "description": practice_value[1]["description"],
+            "exercises": jsonExercises
+        }
+
+        jsonPractices.push(practiceJson)
+    })
+
+    return jsonPractices
+}

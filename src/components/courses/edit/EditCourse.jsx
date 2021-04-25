@@ -105,8 +105,7 @@ class EditCourse extends Component {
             lessonComponents[lesson["id"]] = [
                 <ExpandDetails key={lesson["id"]} title={lesson["name"]} backgroundColor="#fdfcfa" >
                     <LessonDetails
-                        localPracticeComponents={practiceComponents[lesson["id"]]}
-                        localLectureComponents={lectureComponents}
+                        lessonID={lesson['id']}
                         title={lesson["name"]}
                     />
                 </ExpandDetails>,
@@ -119,6 +118,7 @@ class EditCourse extends Component {
         });
 
         this.props.modifyLessonComponents(lessonComponents)
+        this.props.modifyPracticeComponents(practiceComponents)
         this.props.modifyExerciseComponents(exerciseComponents)
         this.props.modifyLectureComponents(lectureComponents)
         this.props.modifyQaComponents(qaComponents)
@@ -165,8 +165,7 @@ class EditCourse extends Component {
         components[uuidKey] = [
             <ExpandDetails key={uuidKey} title={this.state.lessonName} backgroundColor="#fdfcfa" >
                 <LessonDetails
-                    localPracticeComponents={{}}
-                    localLectureComponents={{}}
+                    lessonID={uuidKey}
                     title={this.state.lessonName}
                 />
             </ExpandDetails>,
@@ -272,7 +271,7 @@ const mapDispatchToProps = (dispatch) => {
     return {
         modifyLessonComponents: (element) => { dispatch(modifyLessonComponents(element, 'MODIFY_LESSON_COMPONENTS')) },
         modifyPracticeComponents: (element) => { dispatch(modifyPracticeComponents(element, 'MODIFY_PRACTICE_COMPONENTS')) },
-        modifyLectureComponents: (element) => { dispatch(modifyLectureComponents(element, 'MODIFY_PRACTICE_COMPONENTS')) },
+        modifyLectureComponents: (element) => { dispatch(modifyLectureComponents(element, 'MODIFY_LECTURE_COMPONENTS')) },
         modifyExerciseComponents: (element) => { dispatch(modifyExerciseComponents(element, 'MODIFY_EXERCISE_COMPONENTS')) },
         modifyQaComponents: (element) => { dispatch(modifyQaComponents(element, 'MODIFY_QA_COMPONENTS')) }
     }

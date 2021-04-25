@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
-import { Button, Form, Input, Accordion, Dropdown, TextArea} from 'semantic-ui-react'
+import { Button, Form, Input, Accordion, Dropdown, TextArea } from 'semantic-ui-react'
 import ExpandDetails from "../../course_components/ExpandDetails"
 import PracticeDetails from "./PracticeDetails"
 import PopupDetails from "../../course_components/PopupDetails"
+import {prepare_practice_components} from "../../../adapters/content"
 import { v4 as uuid } from "uuid"
 
 //redux
@@ -48,7 +49,7 @@ class LessonDetails extends Component {
             lessonDescription: "",
             practiceType: "",
             practiceName: "",
-            practiceComponents: this.props.localPracticeComponents
+            practiceComponents: this.props.practiceComponents[this.props.lessonID]
         }
 
     }
@@ -84,7 +85,43 @@ class LessonDetails extends Component {
 
     saveLesson(e) {
         console.log("Request save lesson")
-        console.log("")
+        const lessons = this.props.lessonComponents[this.props.lessonID]
+
+        console.log("Lessons")
+        console.log(lessons)
+
+        console.log("Practices")
+        console.log(this.props.practiceComponents[this.props.lessonID])
+
+        // const jsonPractices = prepare_practice_components(
+        //     this.props.practiceComponents[this.props.lessonID],
+        //     this.props.exerciseComponents,
+        //     this.props.qaComponents
+        // )
+
+        // console.log("Practices")
+        // console.log(jsonPractices)
+
+
+        console.log("Exercises")
+        console.log(this.props.exerciseComponents)
+        console.log("qa")
+        console.log(this.props.qaComponents)
+
+
+        // const final_json = {
+        //     "id": this.props.lessonID,
+        //     "name": "Typing Skils",
+        //     "description": "Desscription of a course",
+        //     "author_id": "unique user id",
+        //     "grade": "3",
+        //     "type": "public",
+        //     "published": false,
+        //     "letures": [],
+        //     "practices": jsonPractices
+        // }
+
+
     }
 
     handleAddContent(e) {
@@ -109,7 +146,6 @@ class LessonDetails extends Component {
         }
 
         const exerciseComponents = this.props.exerciseComponents
-
         exerciseComponents[uuidKey] = []
 
         this.setState({
@@ -118,7 +154,6 @@ class LessonDetails extends Component {
         })
 
         this.props.modifyPracticeComponents(components)
-
         this.props.modifyExerciseComponents(exerciseComponents)
     }
 
@@ -186,15 +221,17 @@ class LessonDetails extends Component {
 
 const mapStateToProps = (state) => {
     return {
+        lessonComponents: state.content.lessonComponents,
         practiceComponents: state.content.practiceComponents,
         exerciseComponents: state.content.exerciseComponents,
+        qaComponents: state.content.qaComponents,
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        modifyPracticeComponents: (element) => { dispatch(modifyPracticeComponents(element, 'MODIFY_LESSON_COMPONENTS')) },
-        modifyExerciseComponents: (element) => { dispatch(modifyExerciseComponents(element, 'MODIFY_PRACTICE_COMPONENTS')) },
+        modifyPracticeComponents: (element) => { dispatch(modifyPracticeComponents(element, 'MODIFY_PRACTICE_COMPONENTS')) },
+        modifyExerciseComponents: (element) => { dispatch(modifyExerciseComponents(element, 'MODIFY_EXERCISE_COMPONENTS')) },
     }
 }
 
