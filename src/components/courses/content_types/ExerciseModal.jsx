@@ -25,7 +25,6 @@ class ExerciseModal extends Component {
         this.handleMoveDown = this.handleMoveDown.bind(this)
         this.fileChange = this.fileChange.bind(this)
         this.handleAddExercise = this.handleAddExercise.bind(this)
-        this.handleModalClose = this.handleModalClose.bind(this)
         this.handleSave = this.handleSave.bind(this)
 
         this.state = {
@@ -36,15 +35,6 @@ class ExerciseModal extends Component {
 
             qaComponents: this.props.qaComponents[this.props.modalID]
         }
-    }
-
-    handleModalClose(e) {
-        this.setState({
-            question: "",
-            contentAnswer: "",
-            speech_2_text: false,
-            image_blob: undefined
-        })
     }
 
     handleRemoveExercise(e) {
@@ -61,23 +51,52 @@ class ExerciseModal extends Component {
     }
 
     handleMoveUp(e) {
-        const element = document.querySelector("#" + e.currentTarget.value)
+        const el_id = e.currentTarget.getAttribute('el_id')
+        const element = document.querySelector("#" + el_id)
 
         if (element !== undefined)
-            if (element.previousElementSibling)
-                element.parentNode.insertBefore(element, element.previousElementSibling);
+            if (element.previousElementSibling) {
+                const previousID = element.previousElementSibling.getAttribute('id').replace("exercise-qa-list-", "")
+
+                const currentID = e.currentTarget.value
+                const qaComponents = this.state.qaComponents
+
+                qaComponents[currentID][1]["order"] -= 1
+                qaComponents[previousID][1]["order"] += 1
+
+                this.setState({ qaComponents: qaComponents })
+
+                const globalQaComponents = this.props.qaComponents
+                globalQaComponents[this.props.modalID] = qaComponents
+                this.props.modifyQaComponents(globalQaComponents)
+                console.log(this.state.qaComponents)
+            }
     }
 
     handleMoveDown(e) {
-        const element = document.querySelector("#" + e.currentTarget.value)
+        const el_id = e.currentTarget.getAttribute('el_id')
+        const element = document.querySelector("#" + el_id)
 
         if (element !== undefined)
-            if (element.nextElementSibling)
-                element.parentNode.insertBefore(element.nextElementSibling, element);
+            if (element.nextElementSibling) {
+                const nextID = element.nextElementSibling.getAttribute('id').replace("exercise-qa-list-", "")
+
+                const currentID = e.currentTarget.value
+                const qaComponents = this.state.qaComponents
+
+                qaComponents[currentID][1]["order"] += 1
+                qaComponents[nextID][1]["order"] -= 1
+
+                this.setState({ qaComponents: qaComponents })
+
+                const globalQaComponents = this.props.qaComponents
+                globalQaComponents[this.props.modalID] = qaComponents
+                this.props.modifyQaComponents(globalQaComponents)
+            }
     }
 
     makeExerciseValid(e) {
-        const key = e.currentTarget.getAttribute('json_key')
+        const key = e.target.getAttribute('json_key')
         let contentAnswer = this.state.qaComponents
 
         contentAnswer[key][1]["is_valid"] = !contentAnswer[key][1]["is_valid"]
@@ -94,18 +113,30 @@ class ExerciseModal extends Component {
         })
     }
 
+    orderContent() {
+        const arr = Object.entries(this.state.qaComponents).map(this.createExercises)
+
+        arr.sort((x, y) => {
+            return ((x["order"] < y["order"]) ? -1 : ((x["order"] > y["order"]) ? 1 : 0))
+        })
+
+        return arr.map(value => value["content"])
+    }
+
     createExercises([key, json_specifics]) {
-        const id = "exercise-list-" + uuid()
+        const id = "exercise-qa-list-" + key
         const html_details = json_specifics[0]
         const json_details = json_specifics[1]
         const is_valid = json_details["is_valid"]
 
-        return <Segment onClick={this.makeExerciseValid} json_key={key} style={{ padding: "1rem" }} key={id} id={id}>
+        const content = <Segment style={{ padding: "1rem" }} key={id} id={id}>
             <Button onClick={this.handleRemoveExercise} value={key} floated="right" color="red" icon="remove circle" size="mini" />
-            <Button onClick={this.handleMoveDown} value={id} floated="right" color="green" icon="arrow circle down" size="mini" />
-            <Button onClick={this.handleMoveUp} value={id} floated="right" color="green" icon="arrow circle up" size="mini" />
-            <span style={{ cursor: "pointer" }}>{is_valid ? <b>{html_details}</b> : html_details}</span>
+            <Button onClick={this.handleMoveDown} value={key} el_id={id} floated="right" color="green" icon="arrow circle down" size="mini" />
+            <Button onClick={this.handleMoveUp} value={key} el_id={id} floated="right" color="green" icon="arrow circle up" size="mini" />
+            <span onClick={this.makeExerciseValid} json_key={key} style={ is_valid ? {cursor: "pointer", fontWeight: "bold"} : {cursor: "pointer"} }>{html_details}</span>
         </Segment>
+
+        return { "content": content, "order": json_details["order"] }
     }
 
     handleAddExercise(e) {
@@ -176,8 +207,8 @@ class ExerciseModal extends Component {
                     </Form.Field>
                     <Image.Group size="tiny">
                         {
-                            this.state.images.map((image) => {
-                                return <Image src={image} />
+                            this.state.images.map((image, idx) => {
+                                return <Image key={idx} src={image} />
                             })
                         }
                     </Image.Group>
@@ -192,7 +223,7 @@ class ExerciseModal extends Component {
                     </Form.Group>
                     <Segment.Group style={exercises_style}>
                         {
-                            Object.entries(this.state.qaComponents).map(this.createExercises)
+                            this.orderContent()
                         }
                     </Segment.Group>
 
