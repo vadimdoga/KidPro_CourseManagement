@@ -145,19 +145,41 @@ class EditCourse extends Component {
     }
 
     handleMoveUp(e) {
-        const element = document.querySelector("#" + e.currentTarget.value)
+        const el_id = e.currentTarget.getAttribute('el_id')
+        const element = document.querySelector("#" + el_id)
 
         if (element !== undefined)
-            if (element.previousElementSibling)
-                element.parentNode.insertBefore(element, element.previousElementSibling);
+            if (element.previousElementSibling) {
+                const previousID = element.previousElementSibling.getAttribute('id').replace("expandable-lesson-list-", "")
+
+                const currentID = e.currentTarget.value
+                const lessonComponents = this.state.lessonComponents
+
+                lessonComponents[currentID][1]["order"] -= 1
+                lessonComponents[previousID][1]["order"] += 1
+
+                this.setState({ lessonComponents: lessonComponents })
+                this.props.modifyLessonComponents(lessonComponents)
+            }
     }
 
     handleMoveDown(e) {
-        const element = document.querySelector("#" + e.currentTarget.value)
+        const el_id = e.currentTarget.getAttribute('el_id')
+        const element = document.querySelector("#" + el_id)
 
         if (element !== undefined)
-            if (element.nextElementSibling)
-                element.parentNode.insertBefore(element.nextElementSibling, element);
+            if (element.nextElementSibling) {
+                const nextID = element.nextElementSibling.getAttribute('id').replace("expandable-lesson-list-", "")
+
+                const currentID = e.currentTarget.value
+                const lessonComponents = this.state.lessonComponents
+
+                lessonComponents[currentID][1]["order"] += 1
+                lessonComponents[nextID][1]["order"] -= 1
+
+                this.setState({ lessonComponents: lessonComponents })
+                this.props.modifyLessonComponents(lessonComponents)
+            }
     }
 
     handleAddExpandable(e) {
@@ -191,15 +213,26 @@ class EditCourse extends Component {
         this.props.modifyLessonComponents(components)
     }
 
+    orderContent() {
+        const arr = Object.entries(this.state.lessonComponents).map(this.createExpandable)
+
+        arr.sort((x, y) => {
+            return ((x["order"] < y["order"]) ? -1 : ((x["order"] > y["order"]) ? 1 : 0))
+        })
+
+        return arr.map(value => value["content"])
+    }
+
     createExpandable([key, json_value]) {
-        console.log(this.state.lessonComponents)
-        const id = "expandable-list-" + key
-        return <div key={id} id={id}>
+        const id = "expandable-lesson-list-" + key
+        const content = <div key={id} id={id}>
             <Button style={btn_right_style} onClick={this.handleRemove} value={key} floated="right" color="red" icon="remove circle" size="mini" />
-            <Button style={btn_style} onClick={this.handleMoveDown} value={id} floated="right" color="teal" icon="arrow circle down" size="mini" />
-            <Button style={btn_style} onClick={this.handleMoveUp} value={id} floated="right" color="teal" icon="arrow circle up" size="mini" />
+            <Button style={btn_style} onClick={this.handleMoveDown} value={key} el_id={id} floated="right" color="teal" icon="arrow circle down" size="mini" />
+            <Button style={btn_style} onClick={this.handleMoveUp} value={key} el_id={id} floated="right" color="teal" icon="arrow circle up" size="mini" />
             {json_value[0]}
         </div>
+
+        return { "content": content, "order": json_value[1]["order"] }
     }
 
     render() {
@@ -255,7 +288,7 @@ class EditCourse extends Component {
 
                     <Accordion style={accordion_style} fluid styled>
                         {
-                            Object.entries(this.state.lessonComponents).map(this.createExpandable)
+                            this.orderContent()
                         }
                     </Accordion>
                 </Segment>
