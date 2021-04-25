@@ -66,10 +66,12 @@ class PracticeDetails extends Component {
 
     saveExerciseComponent(e, exerciseDetails) {
         const exerciseComponents = this.state.exerciseComponents
+        console.log("ex")
+        console.log(exerciseComponents)
 
 
         exerciseComponents[this.props.modalID] = [
-            <span>{ exerciseDetails["question"] }</span>,
+            exerciseDetails["question"],
             exerciseDetails
         ]
 
@@ -77,7 +79,11 @@ class PracticeDetails extends Component {
             exerciseComponents: exerciseComponents
         })
 
-        this.props.modifyExerciseComponents(exerciseComponents)
+        const exerciseGlobalComponents = this.props.exerciseComponents
+        exerciseGlobalComponents[this.props.practiceID] = exerciseComponents
+
+        this.props.modifyExerciseComponents(exerciseGlobalComponents)
+
     }
 
     handleModalClick(e, key, data) {

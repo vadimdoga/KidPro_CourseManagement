@@ -176,6 +176,11 @@ class EditCourse extends Component {
             }
         ]
 
+        const practiceComponents = this.props.practiceComponents
+        practiceComponents[uuidKey] = []
+
+        this.props.modifyPracticeComponents(practiceComponents)
+
         this.setState({
             lessonComponents: components,
             lessonName: ""
