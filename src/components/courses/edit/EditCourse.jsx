@@ -106,6 +106,7 @@ class EditCourse extends Component {
                 <ExpandDetails key={lesson["id"]} title={lesson["name"]} backgroundColor="#fdfcfa" >
                     <LessonDetails
                         lessonID={lesson['id']}
+                        description={lesson["description"]}
                         title={lesson["name"]}
                     />
                 </ExpandDetails>,
@@ -166,6 +167,7 @@ class EditCourse extends Component {
             <ExpandDetails key={uuidKey} title={this.state.lessonName} backgroundColor="#fdfcfa" >
                 <LessonDetails
                     lessonID={uuidKey}
+                    description=""
                     title={this.state.lessonName}
                 />
             </ExpandDetails>,

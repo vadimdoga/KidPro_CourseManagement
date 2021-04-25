@@ -46,7 +46,7 @@ class LessonDetails extends Component {
 
         this.state = {
             lessonName: this.props.title,
-            lessonDescription: "",
+            lessonDescription: this.props.description,
             practiceType: "",
             practiceName: "",
             practiceComponents: this.props.practiceComponents[this.props.lessonID]
@@ -86,42 +86,29 @@ class LessonDetails extends Component {
     saveLesson(e) {
         console.log("Request save lesson")
         const lessons = this.props.lessonComponents[this.props.lessonID]
+        lessons[1]["name"] = this.state.lessonName
+        lessons[1]["description"] = this.state.lessonDescription
 
         console.log("Lessons")
         console.log(lessons)
 
-        console.log("Practices")
-        console.log(this.props.practiceComponents)
-
-        // const jsonPractices = prepare_practice_components(
-        //     this.props.practiceComponents[this.props.lessonID],
-        //     this.props.exerciseComponents,
-        //     this.props.qaComponents
-        // )
-
         // console.log("Practices")
-        // console.log(jsonPractices)
+        // console.log(this.props.practiceComponents)
+
+        const jsonPractices = prepare_practice_components(
+            this.props.practiceComponents[this.props.lessonID],
+            this.props.exerciseComponents,
+            this.props.qaComponents
+        )
+
+        console.log("Practices")
+        console.log(jsonPractices)
 
 
-        console.log("Exercises")
-        console.log(this.props.exerciseComponents)
-        console.log("qa")
-        console.log(this.props.qaComponents)
-
-
-        // const final_json = {
-        //     "id": this.props.lessonID,
-        //     "name": "Typing Skils",
-        //     "description": "Desscription of a course",
-        //     "author_id": "unique user id",
-        //     "grade": "3",
-        //     "type": "public",
-        //     "published": false,
-        //     "letures": [],
-        //     "practices": jsonPractices
-        // }
-
-
+        // console.log("Exercises")
+        // console.log(this.props.exerciseComponents)
+        // console.log("qa")
+        // console.log(this.props.qaComponents)
     }
 
     handleAddContent(e) {
@@ -131,7 +118,12 @@ class LessonDetails extends Component {
         if (this.state.practiceType === "exercise") {
             components[uuidKey] = [
                 <ExpandDetails key={uuidKey} title={this.state.practiceName} backgroundColor="white">
-                    <PracticeDetails practiceID={uuidKey} title={this.state.practiceName} />
+                    <PracticeDetails
+                        lessonID={this.props.lessonID}
+                        practiceID={uuidKey}
+                        title={this.state.practiceName}
+                        description=""
+                    />
                 </ExpandDetails>,
                 {}
             ]

@@ -6,7 +6,7 @@ import ExerciseModal from "./ExerciseModal"
 
 //redux
 import { connect } from "react-redux"
-import { modifyExerciseComponents, modifyQaComponents } from "../../../redux/actions/contentActions"
+import { modifyExerciseComponents, modifyQaComponents, modifyPracticeComponents } from "../../../redux/actions/contentActions"
 import { modifyModalState, modifyModalID, modifyModalData, modifyModalTag } from '../../../redux/actions/modalActions'
 
 const exercises_style = {
@@ -25,13 +25,15 @@ class PracticeDetails extends Component {
         this.handleMoveDown = this.handleMoveDown.bind(this)
         this.handleModalClick = this.handleModalClick.bind(this)
         this.handleBtnClick = this.handleBtnClick.bind(this)
+        this.onTypingDescription = this.onTypingDescription.bind(this)
+        this.onTypingName = this.onTypingName.bind(this)
 
         this.state = {
             practiceName: this.props.title,
-            modalTag: null,
-            practiceDescription: "",
-            practiceBtnKey: this.props.practiceID,
-            exerciseComponents: this.props.exerciseComponents[this.props.practiceID]
+            practiceDescription: this.props.description,
+            exerciseComponents: this.props.exerciseComponents[this.props.practiceID],
+            typingDescriptionTimeout: 0,
+            typingNameTimeout: 0
         }
     }
 
@@ -122,6 +124,44 @@ class PracticeDetails extends Component {
         </Segment>
     }
 
+    onTypingDescription(e) {
+        if (this.state.typingDescriptionTimeout) {
+            clearTimeout(this.state.typingDescriptionTimeout);
+        }
+
+        this.setState({
+            typingDescriptionTimeout: setTimeout(() => {
+                const practiceGlobalComponents = this.props.practiceComponents
+
+                const practiceJson = practiceGlobalComponents[this.props.lessonID][this.props.practiceID][1]
+                practiceJson["description"] = e.target.value
+
+                practiceGlobalComponents[this.props.lessonID][this.props.practiceID][1] = practiceJson
+                this.props.modifyPracticeComponents(practiceGlobalComponents)
+                console.log("description sent")
+            }, 2000)
+        })
+    }
+
+    onTypingName(e) {
+        if (this.state.typingNameTimeout) {
+            clearTimeout(this.state.typingNameTimeout);
+        }
+
+        this.setState({
+            typingNameTimeout: setTimeout(() => {
+                const practiceGlobalComponents = this.props.practiceComponents
+
+                const practiceJson = practiceGlobalComponents[this.props.lessonID][this.props.practiceID][1]
+                practiceJson["name"] = e.target.value
+
+                practiceGlobalComponents[this.props.lessonID][this.props.practiceID][1] = practiceJson
+                this.props.modifyPracticeComponents(practiceGlobalComponents)
+                console.log("name sent")
+            }, 2000)
+        })
+    }
+
     render() {
         return (
             <div>
@@ -133,7 +173,8 @@ class PracticeDetails extends Component {
                         placeholder='Multiplication with 2'
                         width={12}
                         value={this.state.practiceName}
-                        onChange={e => this.setState({practiceName: e.target.value})}
+                        onKeyUp={this.onTypingName}
+                        onChange={e => this.setState({ practiceName: e.target.value })}
                     />
 
                     <Form.Field
@@ -143,7 +184,8 @@ class PracticeDetails extends Component {
                         placeholder='Practice description'
                         value={this.state.practiceDescription}
                         selection
-                        onChange={e => this.setState({practiceDescription: e.target.value})}
+                        onKeyUp={this.onTypingDescription}
+                        onChange={e => {this.setState({ practiceDescription: e.target.value })}}
                     />
                 </Form>
                 <br />
@@ -163,6 +205,7 @@ class PracticeDetails extends Component {
 const mapStateToProps = (state) => {
     return {
         exerciseComponents: state.content.exerciseComponents,
+        practiceComponents: state.content.practiceComponents,
         qaComponents: state.content.qaComponents,
         isOpen: state.modal.modalIsOpen,
         modalTag: state.modal.modalTag,
@@ -172,6 +215,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
+        modifyPracticeComponents: (element) => { dispatch(modifyPracticeComponents(element, 'MODIFY_PRACTICE_COMPONENTS')) },
         modifyExerciseComponents: (element) => { dispatch(modifyExerciseComponents(element, 'MODIFY_EXERCISE_COMPONENTS')) },
         modifyQaComponents: (element) => { dispatch(modifyQaComponents(element, 'MODIFY_QA_COMPONENTS')) },
         modifyModalState: (element) => { dispatch(modifyModalState(element, 'MODIFY_MODAL_STATE')) },

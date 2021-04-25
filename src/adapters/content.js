@@ -71,7 +71,14 @@ export function populate_practice_json(lessonID, practices, practiceComponents, 
         const practiceID = practice["id"]
         practiceComponents = create_missing_field(practiceComponents, lessonID, {})
         practiceComponents[lessonID][practiceID] = [
-            <ExpandDetails key={lessonID} title={practice["name"]} backgroundColor="white" ><PracticeDetails practiceID={practiceID} title={practice["name"]} /></ExpandDetails>,
+            <ExpandDetails key={lessonID} title={practice["name"]} backgroundColor="white" >
+                <PracticeDetails
+                    lessonID={lessonID}
+                    practiceID={practiceID}
+                    title={practice["name"]}
+                    description={practice["description"]}
+                />
+            </ExpandDetails>,
             {
                 "name": practice["name"],
                 "description": practice["description"],
