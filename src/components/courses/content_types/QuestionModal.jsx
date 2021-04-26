@@ -136,7 +136,7 @@ class QuestionModal extends Component {
         const newKey = uuid()
         let components = this.state.lectureQaComponents
         components[newKey] = [
-            <span>{this.state.start_time}</span>,
+            <span>{this.state.contentAnswer}</span>,
             {
                 "answer": this.state.contentAnswer,
                 "order": Object.keys(this.state.lectureQaComponents).length + 1,

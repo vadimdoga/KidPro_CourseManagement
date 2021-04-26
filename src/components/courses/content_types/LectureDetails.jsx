@@ -37,7 +37,8 @@ class LectureDetails extends Component {
             lectureQuestionComponents: this.props.lectureQuestionComponents[this.props.lectureID],
             lectureImages: [],
             typingDescriptionTimeout: 0,
-            typingNameTimeout: 0
+            typingNameTimeout: 0,
+            start_time: null
         }
 
         this.changeGlobalLectureAttribute("name", this.props.title)
@@ -49,7 +50,7 @@ class LectureDetails extends Component {
 
         if (fileID !== -1) {
             arr.splice(fileID, 1);
-            this.setState({lectureImages: arr});
+            this.setState({ lectureImages: arr });
         }
     }
 
@@ -114,7 +115,7 @@ class LectureDetails extends Component {
         const lectureQuestionComponents = this.state.lectureQuestionComponents
         const lectureLength = Object.keys(lectureQuestionComponents).length
         questionDetails["order"] = lectureQuestionComponents[this.props.modalID] ? lectureLength : lectureLength + 1
-
+        questionDetails["start_time"] = this.state.start_time
         lectureQuestionComponents[this.props.modalID] = [
             questionDetails["start_time"],
             questionDetails
@@ -149,7 +150,7 @@ class LectureDetails extends Component {
         this.props.modifyModalData({
             "question": "",
             "speech_2_text": false,
-            "start_time": null
+            "start_time": this.state.start_time
         })
 
         this.props.modifyModalTag(<QuestionModal saveExerciseComponent={this.saveExerciseComponent} />)
@@ -241,8 +242,8 @@ class LectureDetails extends Component {
                 </Form>
                 <Dropzone onDrop={(images) => this.setState({ lectureImages: this.state.lectureImages.concat(images) })}>
                     {({ getRootProps, getInputProps }) => (
-                        <section style={{marginTop: "1rem"}} className="container">
-                            <div style={{cursor: "pointer", marginBottom: "1rem"}} {...getRootProps({ className: 'dropzone0' })}>
+                        <section style={{ marginTop: "1rem" }} className="container">
+                            <div style={{ cursor: "pointer", marginBottom: "1rem" }} {...getRootProps({ className: 'dropzone0' })}>
                                 <input {...getInputProps()} />
                                 <span style={{ fontWeight: "bold", margin: "1rem" }}>Add Files</span>
                                 <Button size="large" icon='upload' />
@@ -263,7 +264,7 @@ class LectureDetails extends Component {
                     )}
                 </Dropzone>
                 <br />
-                <span style={{ fontWeight: "bold", margin: "1rem" }}>Add Exercise</span>
+                <Input circular icon='time' value={this.state.start_time} onChange={e => this.setState({ start_time: e.target.value })} iconPosition='left' placeholder='Question start_time' />
                 <Button onClick={this.handleBtnClick} style={{ marginLeft: "1rem" }} circular size="small" color="green" icon='plus circle' />
 
                 <Segment.Group style={exercises_style}>
