@@ -12,48 +12,55 @@ const create_missing_field = (json_data, field_name, field_type) => {
     return json_data
 }
 
-export function populate_lecture_json(lessonID, lectures, lectureComponents, exerciseComponents, qaComponents) {
+export function populate_lecture_json(lessonID, lectures, lectureComponents, lectureQuestionComponents, lectureQaComponents) {
     lectures.forEach(lecture => {
         const lectureID = lecture["id"]
         lectureComponents = create_missing_field(lectureComponents, lessonID, {})
-        lectureComponents[lessonID][lectureID] = {
-            "html_data": <ExpandDetails key={uuid()} title="Basic Fractions" backgroundColor="#fdfcfa" ><LectureDetails title="Basic Fractions" /></ExpandDetails>,
-            "json_data": {
+        lectureComponents[lessonID][lectureID] = [
+            <ExpandDetails key={lectureID} title={lecture["name"]} backgroundColor="#fdfcfa" >
+                <LectureDetails
+                    lessonID={lessonID}
+                    lectureID={lectureID}
+                    title={lecture["name"]}
+                    description={lecture["description"]}
+                />
+            </ExpandDetails>,
+            {
                 "name": lecture["name"],
                 "description": lecture["description"],
                 "order": lecture["order"],
                 "video": lecture["video"],
                 "images": lecture["images"]
             }
-        }
+        ]
 
         const questions = lecture["questions"]
         questions.forEach(question => {
             const questionID = question["id"]
-            exerciseComponents = create_missing_field(exerciseComponents, lectureID, {})
-            exerciseComponents[lectureID][questionID] = {
-                "html_data": <span>to be implemented</span>,
-                "json_data": {
+            lectureQuestionComponents = create_missing_field(lectureQuestionComponents, lectureID, {})
+            lectureQuestionComponents[lectureID][questionID] = [
+                <span>{ question["start_time"] }</span>,
+                {
                     "speech_2_text": question["speech_to_text"],
                     "order": question["order"],
                     "images": question["images"],
                     "question": question["question"],
                     "start_time": question["start_time"],
                 }
-            }
+            ]
 
             const answers = question["answers"]
             answers.forEach(answer => {
                 const uuidKey = uuid()
-                qaComponents = create_missing_field(qaComponents, questionID, {})
-                qaComponents[questionID][uuidKey] = {
-                    "html_data": <span>to be implemented</span>,
-                    "json_data": {
+                lectureQaComponents = create_missing_field(lectureQaComponents, questionID, {})
+                lectureQaComponents[questionID][uuidKey] = [
+                    answer["answer"],
+                    {
                         "answer": answer["answer"],
                         "is_valid": answer["is_Right"],
                         "order": answer["order"]
                     }
-                }
+                ]
             })
         })
 
@@ -61,8 +68,8 @@ export function populate_lecture_json(lessonID, lectures, lectureComponents, exe
 
     return {
         "lectureComponents": lectureComponents,
-        "exerciseComponents": exerciseComponents,
-        "qaComponents": qaComponents
+        "lectureQuestionComponents": lectureQuestionComponents,
+        "lectureQaComponents": lectureQaComponents
     }
 }
 

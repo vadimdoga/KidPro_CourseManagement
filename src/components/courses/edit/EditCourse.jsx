@@ -11,7 +11,17 @@ import { populate_lecture_json, populate_practice_json } from "../../../adapters
 
 //redux
 import { connect } from "react-redux"
-import { modifyLessonComponents, modifyExerciseComponents, modifyQaComponents, modifyPracticeComponents, modifyLectureComponents } from "../../../redux/actions/contentActions"
+import {
+    modifyLessonComponents,
+
+    modifyPracticeComponents,
+    modifyExerciseComponents,
+    modifyQaComponents,
+
+    modifyLectureComponents,
+    modifyLectureQaComponents,
+    modifyLectureQuestionComponents
+} from "../../../redux/actions/contentActions"
 
 const gradeOptions = [
     { key: 'grade_1', text: 'Grade I', value: 'grade_1' },
@@ -84,17 +94,21 @@ class EditCourse extends Component {
         const lessons = bJson["lessons"]
 
         let lessonComponents = this.state.lessonComponents
+
         let practiceComponents = this.props.practiceComponents
-        let lectureComponents = this.props.lectureComponents
         let exerciseComponents = this.props.exerciseComponents
         let qaComponents = this.props.qaComponents
 
+        let lectureComponents = this.props.lectureComponents
+        let lectureQaComponents = this.props.lectureQaComponents
+        let lectureQuestionComponents = this.props.lectureQuestionComponents
+
         lessons.forEach(lesson => {
-            // const lectures = lesson["lectures"]
-            // const lectureValues = populate_lecture_json(lesson["id"], lectures, lectureComponents, exerciseComponents, qaComponents)
-            // lectureComponents = lectureValues.lectureComponents
-            // exerciseComponents = lectureValues.exerciseComponents
-            // qaComponents = lectureValues.qaComponents
+            const lectures = lesson["lectures"]
+            const lectureValues = populate_lecture_json(lesson["id"], lectures, lectureComponents, lectureQuestionComponents, lectureQaComponents)
+            lectureComponents = lectureValues.lectureComponents
+            lectureQuestionComponents = lectureValues.lectureQuestionComponents
+            lectureQaComponents = lectureValues.lectureQaComponents
 
             const practices = lesson["practises"]
             const practiceValues = populate_practice_json(lesson["id"], practices, practiceComponents, exerciseComponents, qaComponents)
@@ -119,10 +133,14 @@ class EditCourse extends Component {
         });
 
         this.props.modifyLessonComponents(lessonComponents)
+
         this.props.modifyPracticeComponents(practiceComponents)
         this.props.modifyExerciseComponents(exerciseComponents)
-        this.props.modifyLectureComponents(lectureComponents)
         this.props.modifyQaComponents(qaComponents)
+
+        this.props.modifyLectureComponents(lectureComponents)
+        this.props.modifyLectureQaComponents(lectureQaComponents)
+        this.props.modifyLectureQuestionComponents(lectureQuestionComponents)
     }
 
     handleSubmitExit(e) {
@@ -300,20 +318,29 @@ class EditCourse extends Component {
 const mapStateToProps = (state) => {
     return {
         lessonComponents: state.content.lessonComponents,
+
         practiceComponents: state.content.practiceComponents,
-        lectureComponents: state.content.lectureComponents,
         exerciseComponents: state.content.exerciseComponents,
-        qaComponents: state.content.qaComponents
+        qaComponents: state.content.qaComponents,
+
+        lectureComponents: state.content.lectureComponents,
+        lectureQuestionComponents: state.content.lectureQuestionComponents,
+        lectureQaComponents: state.content.lectureQaComponents
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
         modifyLessonComponents: (element) => { dispatch(modifyLessonComponents(element, 'MODIFY_LESSON_COMPONENTS')) },
+
         modifyPracticeComponents: (element) => { dispatch(modifyPracticeComponents(element, 'MODIFY_PRACTICE_COMPONENTS')) },
-        modifyLectureComponents: (element) => { dispatch(modifyLectureComponents(element, 'MODIFY_LECTURE_COMPONENTS')) },
         modifyExerciseComponents: (element) => { dispatch(modifyExerciseComponents(element, 'MODIFY_EXERCISE_COMPONENTS')) },
-        modifyQaComponents: (element) => { dispatch(modifyQaComponents(element, 'MODIFY_QA_COMPONENTS')) }
+        modifyQaComponents: (element) => { dispatch(modifyQaComponents(element, 'MODIFY_QA_COMPONENTS')) },
+
+        modifyLectureComponents: (element) => { dispatch(modifyLectureComponents(element, 'MODIFY_LECTURE_COMPONENTS')) },
+        modifyLectureQuestionComponents: (element) => { dispatch(modifyLectureQuestionComponents(element, 'MODIFY_LECTURE_QUESTION_COMPONENTS')) },
+        modifyLectureQaComponents: (element) => { dispatch(modifyLectureQaComponents(element, 'MODIFY_LECTURE_QA_COMPONENTS')) },
+
     }
 }
 

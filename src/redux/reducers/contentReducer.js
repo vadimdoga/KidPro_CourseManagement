@@ -2,6 +2,8 @@ const initState = {
     lessonComponents: {},
     practiceComponents: {},
     lectureComponents: {},
+    lectureQaComponents: {},
+    lectureQuestionComponents: {},
     exerciseComponents: {},
     qaComponents: {}
 }
@@ -34,6 +36,20 @@ const contentReducer = (state = initState, action) => {
         return {
             ...state,
             lectureComponents: lectureComponents
+        }
+    } else if (action.type === 'MODIFY_LECTURE_QA_COMPONENTS') {
+        const lectureQaComponents = action.element
+
+        return {
+            ...state,
+            lectureQaComponents: lectureQaComponents
+        }
+    } else if (action.type === 'MODIFY_LECTURE_QUESTION_COMPONENTS') {
+        const lectureQuestionComponents = action.element
+
+        return {
+            ...state,
+            lectureQuestionComponents: lectureQuestionComponents
         }
     } else if (action.type === 'MODIFY_QA_COMPONENTS') {
         const qaComponents = action.element

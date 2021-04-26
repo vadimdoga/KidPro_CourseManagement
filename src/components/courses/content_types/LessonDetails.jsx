@@ -2,13 +2,14 @@ import React, { Component } from 'react'
 import { Button, Form, Input, Accordion, Dropdown, TextArea } from 'semantic-ui-react'
 import ExpandDetails from "../../course_components/ExpandDetails"
 import PracticeDetails from "./PracticeDetails"
+import LectureDetails from "./LectureDetails"
 import PopupDetails from "../../course_components/PopupDetails"
 import { prepare_practice_components } from "../../../adapters/content"
 import { v4 as uuid } from "uuid"
 
 //redux
 import { connect } from "react-redux"
-import { modifyPracticeComponents, modifyExerciseComponents } from "../../../redux/actions/contentActions"
+import { modifyPracticeComponents, modifyExerciseComponents, modifyLectureComponents, modifyLectureQuestionComponents } from "../../../redux/actions/contentActions"
 
 
 const accordion_style = {
@@ -49,9 +50,9 @@ class LessonDetails extends Component {
             lessonDescription: this.props.description,
             practiceType: "",
             practiceName: "",
-            practiceComponents: this.props.practiceComponents[this.props.lessonID]
+            practiceComponents: this.props.practiceComponents[this.props.lessonID] ? this.props.practiceComponents[this.props.lessonID] : {},
+            lectureComponents: this.props.lectureComponents[this.props.lessonID] ? this.props.lectureComponents[this.props.lessonID] : {}
         }
-
     }
 
     handleRemove(e) {
@@ -73,19 +74,36 @@ class LessonDetails extends Component {
 
         if (element !== undefined)
             if (element.previousElementSibling) {
-                const previousID = element.previousElementSibling.getAttribute('id').replace("expandable-practice-list-", "")
+                const previousID = element.previousElementSibling.getAttribute('id').replace("expandable-list-", "")
 
                 const currentID = e.currentTarget.value
                 const practiceComponents = this.state.practiceComponents
+                const lectureComponents = this.state.lectureComponents
 
-                practiceComponents[currentID][1]["order"] -= 1
-                practiceComponents[previousID][1]["order"] += 1
+                if (currentID in practiceComponents) {
+                    practiceComponents[currentID][1]["order"] -= 1
+                } else if (currentID in lectureComponents) {
+                    lectureComponents[currentID][1]["order"] -= 1
+                }
 
-                this.setState({ practiceComponents: practiceComponents })
+                if (previousID in practiceComponents) {
+                    practiceComponents[previousID][1]["order"] += 1
+                } else if (previousID in lectureComponents) {
+                    lectureComponents[previousID][1]["order"] += 1
+                }
+
+                this.setState({
+                    practiceComponents: practiceComponents,
+                    lectureComponents: lectureComponents
+                })
 
                 const globalPracticeComponents = this.props.practiceComponents
                 globalPracticeComponents[this.props.lessonID] = practiceComponents
                 this.props.modifyPracticeComponents(globalPracticeComponents)
+
+                const globalLectureComponents = this.props.lectureComponents
+                globalLectureComponents[this.props.lessonID] = lectureComponents
+                this.props.modifyLectureComponents(globalLectureComponents)
             }
     }
 
@@ -95,19 +113,36 @@ class LessonDetails extends Component {
 
         if (element !== undefined)
             if (element.nextElementSibling) {
-                const nextID = element.nextElementSibling.getAttribute('id').replace("expandable-practice-list-", "")
+                const nextID = element.nextElementSibling.getAttribute('id').replace("expandable-list-", "")
 
                 const currentID = e.currentTarget.value
                 const practiceComponents = this.state.practiceComponents
+                const lectureComponents = this.state.lectureComponents
 
-                practiceComponents[currentID][1]["order"] += 1
-                practiceComponents[nextID][1]["order"] -= 1
+                if (currentID in practiceComponents) {
+                    practiceComponents[currentID][1]["order"] += 1
+                } else if (currentID in lectureComponents) {
+                    lectureComponents[currentID][1]["order"] += 1
+                }
 
-                this.setState({ practiceComponents: practiceComponents })
+                if (nextID in practiceComponents) {
+                    practiceComponents[nextID][1]["order"] -= 1
+                } else if (nextID in lectureComponents) {
+                    lectureComponents[nextID][1]["order"] -= 1
+                }
+
+                this.setState({
+                    practiceComponents: practiceComponents,
+                    lectureComponents: lectureComponents
+                })
 
                 const globalPracticeComponents = this.props.practiceComponents
                 globalPracticeComponents[this.props.lessonID] = practiceComponents
                 this.props.modifyPracticeComponents(globalPracticeComponents)
+
+                const globalLectureComponents = this.props.lectureComponents
+                globalLectureComponents[this.props.lessonID] = lectureComponents
+                this.props.modifyLectureComponents(globalLectureComponents)
             }
     }
 
@@ -159,7 +194,12 @@ class LessonDetails extends Component {
         } else if (this.state.practiceType === "lecture") {
             components[uuidKey] = [
                 <ExpandDetails key={uuidKey} title={this.state.practiceName} backgroundColor="#fdfcfa">
-                    This is a lecture
+                    <LectureDetails
+                        lessonID={this.props.lessonID}
+                        lectureID={uuidKey}
+                        title={this.state.practiceName}
+                        description=""
+                    />
                 </ExpandDetails>,
                 {"order": Object.keys(this.state.lectureComponents).length + 1}
             ]
@@ -181,17 +221,20 @@ class LessonDetails extends Component {
     }
 
     orderContent() {
+        const lecture_arr = Object.entries(this.state.lectureComponents).map(this.createExpandable)
         const arr = Object.entries(this.state.practiceComponents).map(this.createExpandable)
 
-        arr.sort((x, y) => {
+        const newArr = [...lecture_arr, ...arr]
+
+        newArr.sort((x, y) => {
             return ((x["order"] < y["order"]) ? -1 : ((x["order"] > y["order"]) ? 1 : 0))
         })
 
-        return arr.map(value => value["content"])
+        return newArr.map(value => value["content"])
     }
 
     createExpandable([key, value]) {
-        const id = "expandable-practice-list-" + key
+        const id = "expandable-list-" + key
         const content = <div key={id} id={id}>
             <Button style={btn_right_style} onClick={this.handleRemove} value={key} floated="right" color="red" icon="remove circle" size="mini" />
             <Button style={btn_style} onClick={this.handleMoveDown} value={key} el_id={id} floated="right" color="yellow" icon="arrow circle down" size="mini" />
@@ -257,9 +300,14 @@ class LessonDetails extends Component {
 const mapStateToProps = (state) => {
     return {
         lessonComponents: state.content.lessonComponents,
+
         practiceComponents: state.content.practiceComponents,
         exerciseComponents: state.content.exerciseComponents,
         qaComponents: state.content.qaComponents,
+
+        lectureComponents: state.content.lectureComponents,
+        lectureQuestionComponents: state.content.lectureQuestionComponents,
+        lectureQaComponents: state.content.lectureQaComponents
     }
 }
 
@@ -267,6 +315,9 @@ const mapDispatchToProps = (dispatch) => {
     return {
         modifyPracticeComponents: (element) => { dispatch(modifyPracticeComponents(element, 'MODIFY_PRACTICE_COMPONENTS')) },
         modifyExerciseComponents: (element) => { dispatch(modifyExerciseComponents(element, 'MODIFY_EXERCISE_COMPONENTS')) },
+
+        modifyLectureComponents: (element) => { dispatch(modifyLectureComponents(element, 'MODIFY_LECTURE_COMPONENTS')) },
+        modifyLectureQuestionComponents: (element) => { dispatch(modifyLectureQuestionComponents(element, 'MODIFY_LECTURE_QUESTION_COMPONENTS')) },
     }
 }
 

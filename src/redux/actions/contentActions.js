@@ -26,6 +26,20 @@ const modifyLectureComponents = (element, type) => {
     }
 }
 
+const modifyLectureQaComponents = (element, type) => {
+    return {
+        type,
+        element
+    }
+}
+
+const modifyLectureQuestionComponents = (element, type) => {
+    return {
+        type,
+        element
+    }
+}
+
 const modifyQaComponents = (element, type) => {
     return {
         type,
@@ -34,4 +48,14 @@ const modifyQaComponents = (element, type) => {
 }
 
 
-export { modifyExerciseComponents, modifyLessonComponents, modifyPracticeComponents, modifyLectureComponents, modifyQaComponents }
+export {
+    modifyLessonComponents,
+
+    modifyPracticeComponents,
+    modifyExerciseComponents,
+    modifyQaComponents,
+
+    modifyLectureComponents,
+    modifyLectureQaComponents,
+    modifyLectureQuestionComponents,
+}
