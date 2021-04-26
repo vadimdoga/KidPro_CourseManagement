@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Form, Input, TextArea, Button, Segment, Icon } from 'semantic-ui-react'
+import { Form, Input, TextArea, Button, Segment} from 'semantic-ui-react'
 import { v4 as uuid } from "uuid"
 
 import QuestionModal from "./QuestionModal"

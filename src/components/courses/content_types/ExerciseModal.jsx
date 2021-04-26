@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Form, Button, Segment, Checkbox, Modal, Image } from 'semantic-ui-react'
+import { Form, Button, Segment, Checkbox, Modal} from 'semantic-ui-react'
 import { v4 as uuid } from "uuid"
 
 import Dropzone from 'react-dropzone'
