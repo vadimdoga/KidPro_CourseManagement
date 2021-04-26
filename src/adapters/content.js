@@ -34,7 +34,7 @@ export function populate_lecture_json(lessonID, lectures, lectureComponents, exe
             exerciseComponents[lectureID][questionID] = {
                 "html_data": <span>to be implemented</span>,
                 "json_data": {
-                    "speech_to_text": question["speech_to_text"],
+                    "speech_2_text": question["speech_to_text"],
                     "order": question["order"],
                     "images": question["images"],
                     "question": question["question"],
@@ -93,7 +93,7 @@ export function populate_practice_json(lessonID, practices, practiceComponents, 
             exerciseComponents[practiceID][exerciseID] = [
                 exercise["question"],
                 {
-                    "speech_to_text": exercise["speech_to_text"],
+                    "speech_2_text": exercise["speech_to_text"],
                     "order": exercise["order"],
                     "images": exercise["images"],
                     "question": exercise["question"]
@@ -139,7 +139,7 @@ export function prepare_practice_components(practiceComponents, exerciseComponen
                 const answerJson = {
                     "id": answer_key,
                     "answer": answer_value[1]["answer"],
-                    "is_Right": answer_value[1]["isOpen"],
+                    "is_valid": answer_value[1]["is_valid"],
                     "order": answer_value[1]["order"]
                 }
 
@@ -148,7 +148,7 @@ export function prepare_practice_components(practiceComponents, exerciseComponen
 
             const exerciseJson = {
                 "id": exercise_key,
-                "speech_to_text": exercise_value[1]["speech_to_text"],
+                "speech_2_text": exercise_value[1]["speech_2_text"],
                 "order": exercise_value[1]["order"],
                 "images": exercise_value[1]["images"],
                 "question": exercise_value[1]["question"],

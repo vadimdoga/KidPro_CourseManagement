@@ -153,7 +153,7 @@ class LessonDetails extends Component {
                         description=""
                     />
                 </ExpandDetails>,
-                {"order": 0}
+                {"order": Object.keys(this.state.practiceComponents).length + 1}
             ]
 
         } else if (this.state.practiceType === "lecture") {
@@ -161,12 +161,12 @@ class LessonDetails extends Component {
                 <ExpandDetails key={uuidKey} title={this.state.practiceName} backgroundColor="#fdfcfa">
                     This is a lecture
                 </ExpandDetails>,
-                {"order": 0}
+                {"order": Object.keys(this.state.lectureComponents).length + 1}
             ]
         }
 
         const exerciseComponents = this.props.exerciseComponents
-        exerciseComponents[uuidKey] = []
+        exerciseComponents[uuidKey] = {}
 
         this.setState({
             practiceName: "",

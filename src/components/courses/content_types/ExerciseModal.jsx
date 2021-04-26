@@ -146,7 +146,8 @@ class ExerciseModal extends Component {
             <span>{this.state.contentAnswer}</span>,
             {
                 "answer": this.state.contentAnswer,
-                "is_valid": this.state.is_valid
+                "order": Object.keys(this.state.qaComponents).length + 1,
+                "is_valid": false
             }
         ]
 
@@ -159,17 +160,17 @@ class ExerciseModal extends Component {
     }
 
     handleSave(e) {
-        const components = this.props.qaComponents
+        const qaComponents = this.props.qaComponents
 
-        components[this.props.modalID] = this.state.qaComponents
+        qaComponents[this.props.modalID] = this.state.qaComponents
 
         this.props.modifyModalState(false)
-        this.props.modifyQaComponents(components)
+        this.props.modifyQaComponents(qaComponents)
 
         this.props.saveExerciseComponent(e, {
             "question": this.state.question,
             "speech_2_text": this.state.speech_2_text,
-            "images": this.state.images,
+            "images": this.state.images
         })
     }
 

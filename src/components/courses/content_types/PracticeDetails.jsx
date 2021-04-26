@@ -35,6 +35,8 @@ class PracticeDetails extends Component {
             typingDescriptionTimeout: 0,
             typingNameTimeout: 0
         }
+
+        this.changeGlobalPracticeAttribute("name", this.props.title)
     }
 
     handleRemove(e) {
@@ -96,9 +98,8 @@ class PracticeDetails extends Component {
 
     saveExerciseComponent(e, exerciseDetails) {
         const exerciseComponents = this.state.exerciseComponents
-        console.log("ex")
-        console.log(exerciseComponents)
 
+        exerciseDetails["order"] = Object.keys(exerciseComponents).length + 1
 
         exerciseComponents[this.props.modalID] = [
             exerciseDetails["question"],
@@ -113,7 +114,6 @@ class PracticeDetails extends Component {
         exerciseGlobalComponents[this.props.practiceID] = exerciseComponents
 
         this.props.modifyExerciseComponents(exerciseGlobalComponents)
-
     }
 
     handleModalClick(e, key, data) {
@@ -134,7 +134,7 @@ class PracticeDetails extends Component {
         this.props.modifyModalID(newKey)
         this.props.modifyModalData({
             "question": "",
-            "speech_to_text": false,
+            "speech_2_text": false,
             "images": []
         })
 
@@ -164,6 +164,16 @@ class PracticeDetails extends Component {
         return { "content": content, "order": value[1]["order"] }
     }
 
+    changeGlobalPracticeAttribute(attribute, attrValue) {
+        const practiceGlobalComponents = this.props.practiceComponents
+
+        const practiceJson = practiceGlobalComponents[this.props.lessonID][this.props.practiceID][1]
+        practiceJson[attribute] = attrValue
+
+        practiceGlobalComponents[this.props.lessonID][this.props.practiceID][1] = practiceJson
+        this.props.modifyPracticeComponents(practiceGlobalComponents)
+    }
+
     onTypingDescription(e) {
         if (this.state.typingDescriptionTimeout) {
             clearTimeout(this.state.typingDescriptionTimeout);
@@ -171,15 +181,9 @@ class PracticeDetails extends Component {
 
         this.setState({
             typingDescriptionTimeout: setTimeout(() => {
-                const practiceGlobalComponents = this.props.practiceComponents
-
-                const practiceJson = practiceGlobalComponents[this.props.lessonID][this.props.practiceID][1]
-                practiceJson["description"] = e.target.value
-
-                practiceGlobalComponents[this.props.lessonID][this.props.practiceID][1] = practiceJson
-                this.props.modifyPracticeComponents(practiceGlobalComponents)
+                this.changeGlobalPracticeAttribute("description", e.target.value)
                 console.log("description sent")
-            }, 2000)
+            }, 1000)
         })
     }
 
@@ -190,15 +194,9 @@ class PracticeDetails extends Component {
 
         this.setState({
             typingNameTimeout: setTimeout(() => {
-                const practiceGlobalComponents = this.props.practiceComponents
-
-                const practiceJson = practiceGlobalComponents[this.props.lessonID][this.props.practiceID][1]
-                practiceJson["name"] = e.target.value
-
-                practiceGlobalComponents[this.props.lessonID][this.props.practiceID][1] = practiceJson
-                this.props.modifyPracticeComponents(practiceGlobalComponents)
+                this.changeGlobalPracticeAttribute("name", e.target.value)
                 console.log("name sent")
-            }, 2000)
+            }, 1000)
         })
     }
 
@@ -224,7 +222,7 @@ class PracticeDetails extends Component {
                         placeholder='Practice description'
                         value={this.state.practiceDescription}
                         onKeyUp={this.onTypingDescription}
-                        onChange={e => {this.setState({ practiceDescription: e.target.value })}}
+                        onChange={e => { this.setState({ practiceDescription: e.target.value }) }}
                     />
                 </Form>
                 <br />

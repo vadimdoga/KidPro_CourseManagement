@@ -196,7 +196,7 @@ class EditCourse extends Component {
             {
                 "name": this.state.lessonName,
                 "description": "",
-                "order": 0
+                "order": Object.keys(this.state.lessonComponents).length + 1
             }
         ]
 
