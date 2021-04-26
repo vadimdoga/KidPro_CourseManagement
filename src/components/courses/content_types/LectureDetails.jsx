@@ -1,12 +1,14 @@
 import React, { Component } from 'react'
-import { Form, Input, TextArea, Button, Segment } from 'semantic-ui-react'
+import { Form, Input, TextArea, Button, Segment, Icon } from 'semantic-ui-react'
 import { v4 as uuid } from "uuid"
 
 import QuestionModal from "./QuestionModal"
+import Dropzone from 'react-dropzone'
+// import ImageUploader from 'react-images-upload';
 
 //redux
 import { connect } from "react-redux"
-import {modifyLectureComponents, modifyLectureQuestionComponents, modifyLectureQaComponents } from "../../../redux/actions/contentActions"
+import { modifyLectureComponents, modifyLectureQuestionComponents, modifyLectureQaComponents } from "../../../redux/actions/contentActions"
 import { modifyModalState, modifyModalID, modifyModalData, modifyModalTag } from '../../../redux/actions/modalActions'
 
 const exercises_style = {
@@ -27,16 +29,34 @@ class LectureDetails extends Component {
         this.handleBtnClick = this.handleBtnClick.bind(this)
         this.onTypingDescription = this.onTypingDescription.bind(this)
         this.onTypingName = this.onTypingName.bind(this)
+        this.removeFile = this.removeFile.bind(this)
 
         this.state = {
             lectureName: this.props.title,
             lectureDescription: this.props.description,
             lectureQuestionComponents: this.props.lectureQuestionComponents[this.props.lectureID],
+            lectureImages: [],
             typingDescriptionTimeout: 0,
             typingNameTimeout: 0
         }
 
         this.changeGlobalLectureAttribute("name", this.props.title)
+    }
+
+    removeFile(e) {
+        const file = e.target.getAttribute('file')
+        const arr = [...this.state.lectureImages]
+        let index = -1
+
+        arr.forEach((value, idx) => {
+            if (value == file)
+                index = idx
+        })
+
+        if (index !== -1) {
+          arr.splice(index, 1);
+          this.setState({lectureImages: arr});
+        }
     }
 
     handleRemove(e) {
@@ -225,6 +245,29 @@ class LectureDetails extends Component {
                         onChange={e => { this.setState({ lectureDescription: e.target.value }) }}
                     />
                 </Form>
+                <Dropzone onDrop={(images) => this.setState({ lectureImages: this.state.lectureImages.concat(images) })}>
+                    {({ getRootProps, getInputProps }) => (
+                        <section style={{marginTop: "1rem"}} className="container">
+                            <div style={{cursor: "pointer", marginBottom: "1rem"}} {...getRootProps({ className: 'dropzone' })}>
+                                <input {...getInputProps()} />
+                                <span style={{ fontWeight: "bold", margin: "1rem" }}>Add Files</span>
+                                <Button size="large" icon='upload' />
+                            </div>
+                            <aside>
+                                <h4>Files</h4>
+                                <ul>
+                                    {
+                                        this.state.lectureImages.map(file => (
+                                            <li style={{cursor: "pointer"}} onClick={this.removeFile} file={file} key={file.name}>
+                                                {file.name} - {file.size} bytes
+                                            </li>
+                                        ))
+                                    }
+                                </ul>
+                            </aside>
+                        </section>
+                    )}
+                </Dropzone>
                 <br />
                 <span style={{ fontWeight: "bold", margin: "1rem" }}>Add Exercise</span>
                 <Button onClick={this.handleBtnClick} style={{ marginLeft: "1rem" }} circular size="small" color="green" icon='plus circle' />
