@@ -179,3 +179,53 @@ export function prepare_practice_components(practiceComponents, exerciseComponen
 
     return jsonPractices
 }
+
+export function prepare_lecture_components(lectureComponents, questionComponents, qaComponents) {
+    const jsonLectures = []
+    const lectures = lectureComponents
+
+    Object.entries(lectures).forEach(([lecture_key, lecture_value]) => {
+        const questions = questionComponents[lecture_key]
+        const jsonQuestions = []
+
+        Object.entries(questions).forEach(([question_key, question_value]) => {
+            const answers = qaComponents[question_key]
+            const jsonAnswers = []
+
+            Object.entries(answers).forEach(([answer_key, answer_value]) => {
+                const answerJson = {
+                    "id": answer_key,
+                    "answer": answer_value[1]["answer"],
+                    "is_valid": answer_value[1]["is_valid"],
+                    "order": answer_value[1]["order"]
+                }
+
+                jsonAnswers.push(answerJson)
+            })
+
+            const questionJson = {
+                "id": question_key,
+                "speech_2_text": question_value[1]["speech_2_text"],
+                "order": question_value[1]["order"],
+                "question": question_value[1]["question"],
+                "start_time": question_value[1]["start_time"],
+                "answers": jsonAnswers
+            }
+
+            jsonQuestions.push(questionJson)
+        })
+
+        const lectureJson = {
+            "id": lecture_key,
+            "name": lecture_value[1]["name"],
+            "order": lecture_value[1]["order"],
+            "files": lecture_value[1]["lectureImages"],
+            "description": lecture_value[1]["description"],
+            "questions": jsonQuestions
+        }
+
+        jsonLectures.push(lectureJson)
+    })
+
+    return jsonLectures
+}
