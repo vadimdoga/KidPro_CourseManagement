@@ -128,7 +128,7 @@ class PracticeDetails extends Component {
         const newKey = uuid()
         const components = this.props.qaComponents
         components[newKey] = {}
-        console.log("State " + this.props.isOpen)
+
         this.props.modifyModalState(true)
         this.props.modifyQaComponents(components)
         this.props.modifyModalID(newKey)
@@ -223,7 +223,6 @@ class PracticeDetails extends Component {
                         label='Description'
                         placeholder='Practice description'
                         value={this.state.practiceDescription}
-                        selection
                         onKeyUp={this.onTypingDescription}
                         onChange={e => {this.setState({ practiceDescription: e.target.value })}}
                     />

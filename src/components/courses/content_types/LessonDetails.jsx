@@ -153,7 +153,7 @@ class LessonDetails extends Component {
                         description=""
                     />
                 </ExpandDetails>,
-                {}
+                {"order": 0}
             ]
 
         } else if (this.state.practiceType === "lecture") {
@@ -161,7 +161,7 @@ class LessonDetails extends Component {
                 <ExpandDetails key={uuidKey} title={this.state.practiceName} backgroundColor="#fdfcfa">
                     This is a lecture
                 </ExpandDetails>,
-                {}
+                {"order": 0}
             ]
         }
 
@@ -223,7 +223,6 @@ class LessonDetails extends Component {
                         label='Description'
                         placeholder='Lesson description'
                         value={this.state.lessonDescription}
-                        selection
                         onChange={e => this.setState({ lessonDescription: e.target.value })}
                     />
                 </Form>
