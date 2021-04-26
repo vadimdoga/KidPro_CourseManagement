@@ -44,18 +44,12 @@ class LectureDetails extends Component {
     }
 
     removeFile(e) {
-        const file = e.target.getAttribute('file')
+        const fileID = e.currentTarget.getAttribute('fileID')
         const arr = [...this.state.lectureImages]
-        let index = -1
 
-        arr.forEach((value, idx) => {
-            if (value == file)
-                index = idx
-        })
-
-        if (index !== -1) {
-          arr.splice(index, 1);
-          this.setState({lectureImages: arr});
+        if (fileID !== -1) {
+            arr.splice(fileID, 1);
+            this.setState({lectureImages: arr});
         }
     }
 
@@ -248,7 +242,7 @@ class LectureDetails extends Component {
                 <Dropzone onDrop={(images) => this.setState({ lectureImages: this.state.lectureImages.concat(images) })}>
                     {({ getRootProps, getInputProps }) => (
                         <section style={{marginTop: "1rem"}} className="container">
-                            <div style={{cursor: "pointer", marginBottom: "1rem"}} {...getRootProps({ className: 'dropzone' })}>
+                            <div style={{cursor: "pointer", marginBottom: "1rem"}} {...getRootProps({ className: 'dropzone0' })}>
                                 <input {...getInputProps()} />
                                 <span style={{ fontWeight: "bold", margin: "1rem" }}>Add Files</span>
                                 <Button size="large" icon='upload' />
@@ -257,8 +251,8 @@ class LectureDetails extends Component {
                                 <h4>Files</h4>
                                 <ul>
                                     {
-                                        this.state.lectureImages.map(file => (
-                                            <li style={{cursor: "pointer"}} onClick={this.removeFile} file={file} key={file.name}>
+                                        this.state.lectureImages.map((file, idx) => (
+                                            <li style={{ cursor: "pointer" }} onClick={this.removeFile} fileID={idx} key={uuid()}>
                                                 {file.name} - {file.size} bytes
                                             </li>
                                         ))
