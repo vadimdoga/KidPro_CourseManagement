@@ -38,7 +38,7 @@ class LectureDetails extends Component {
             lectureImages: [],
             typingDescriptionTimeout: 0,
             typingNameTimeout: 0,
-            start_time: null
+            start_time: 0
         }
 
         this.changeGlobalLectureAttribute("name", this.props.title)
@@ -114,15 +114,18 @@ class LectureDetails extends Component {
     saveExerciseComponent(e, questionDetails) {
         const lectureQuestionComponents = this.state.lectureQuestionComponents
         const lectureLength = Object.keys(lectureQuestionComponents).length
+
         questionDetails["order"] = lectureQuestionComponents[this.props.modalID] ? lectureLength : lectureLength + 1
         questionDetails["start_time"] = this.state.start_time
+
         lectureQuestionComponents[this.props.modalID] = [
             questionDetails["start_time"],
             questionDetails
         ]
 
         this.setState({
-            lectureQuestionComponents: lectureQuestionComponents
+            lectureQuestionComponents: lectureQuestionComponents,
+            start_time: 0
         })
 
         const lectureGlobalComponents = this.props.lectureQuestionComponents
@@ -181,6 +184,10 @@ class LectureDetails extends Component {
 
     changeGlobalLectureAttribute(attribute, attrValue) {
         const lectureGlobalComponents = this.props.lectureComponents
+
+        console.log(lectureGlobalComponents)
+        console.log(this.props.lessonID)
+        console.log(this.props.lectureID)
 
         const lectureJson = lectureGlobalComponents[this.props.lessonID][this.props.lectureID][1]
         lectureJson[attribute] = attrValue

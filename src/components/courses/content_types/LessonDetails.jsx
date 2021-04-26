@@ -176,10 +176,13 @@ class LessonDetails extends Component {
 
     handleAddContent(e) {
         const uuidKey = uuid()
-        let components = this.state.practiceComponents
+        const practiceComponents = this.state.practiceComponents
+        const lectureComponents = this.state.lectureComponents
+
+        const componentsLength = Object.keys(this.state.practiceComponents).length + Object.keys(this.state.lectureComponents).length
 
         if (this.state.practiceType === "exercise") {
-            components[uuidKey] = [
+            practiceComponents[uuidKey] = [
                 <ExpandDetails key={uuidKey} title={this.state.practiceName} backgroundColor="white">
                     <PracticeDetails
                         lessonID={this.props.lessonID}
@@ -188,11 +191,11 @@ class LessonDetails extends Component {
                         description=""
                     />
                 </ExpandDetails>,
-                {"order": Object.keys(this.state.practiceComponents).length + 1}
+                {"order": componentsLength + 1}
             ]
 
         } else if (this.state.practiceType === "lecture") {
-            components[uuidKey] = [
+            lectureComponents[uuidKey] = [
                 <ExpandDetails key={uuidKey} title={this.state.practiceName} backgroundColor="#fdfcfa">
                     <LectureDetails
                         lessonID={this.props.lessonID}
@@ -201,23 +204,33 @@ class LessonDetails extends Component {
                         description=""
                     />
                 </ExpandDetails>,
-                {"order": Object.keys(this.state.lectureComponents).length + 1}
+                {"order": componentsLength + 1}
             ]
         }
 
         const exerciseComponents = this.props.exerciseComponents
         exerciseComponents[uuidKey] = {}
 
+        const questionComponents = this.props.lectureQuestionComponents
+        questionComponents[uuidKey] = {}
+
         this.setState({
             practiceName: "",
-            practiceComponents: components
+            practiceComponents: practiceComponents,
+            lectureComponents: lectureComponents
         })
 
         const practiceGlobalComponents = this.props.practiceComponents
-        practiceGlobalComponents[this.props.lessonID] = components
+        practiceGlobalComponents[this.props.lessonID] = practiceComponents
 
         this.props.modifyPracticeComponents(practiceGlobalComponents)
         this.props.modifyExerciseComponents(exerciseComponents)
+
+        const lectureGlobalComponents = this.props.lectureComponents
+        lectureGlobalComponents[this.props.lessonID] = lectureComponents
+
+        this.props.modifyLectureComponents(lectureGlobalComponents)
+        this.props.modifyLectureQuestionComponents(questionComponents)
     }
 
     orderContent() {
