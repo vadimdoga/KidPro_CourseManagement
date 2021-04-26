@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import { Form, Button, Segment, Checkbox, Modal, Image } from 'semantic-ui-react'
 import { v4 as uuid } from "uuid"
 
+import Dropzone from 'react-dropzone'
+
 //redux
 import { connect } from "react-redux"
 import { modifyQaComponents } from "../../../redux/actions/contentActions"
@@ -26,6 +28,7 @@ class ExerciseModal extends Component {
         this.fileChange = this.fileChange.bind(this)
         this.handleAddExercise = this.handleAddExercise.bind(this)
         this.handleSave = this.handleSave.bind(this)
+        this.removeFile = this.removeFile.bind(this)
 
         this.state = {
             question: this.props.modalData["question"],
@@ -34,6 +37,16 @@ class ExerciseModal extends Component {
             images: this.props.modalData["images"],
 
             qaComponents: this.props.qaComponents[this.props.modalID]
+        }
+    }
+
+    removeFile(e) {
+        const fileID = e.currentTarget.getAttribute('fileID')
+        const arr = [...this.state.images]
+
+        if (fileID !== -1) {
+            arr.splice(fileID, 1);
+            this.setState({images: arr});
         }
     }
 
@@ -133,7 +146,7 @@ class ExerciseModal extends Component {
             <Button onClick={this.handleRemoveExercise} value={key} floated="right" color="red" icon="remove circle" size="mini" />
             <Button onClick={this.handleMoveDown} value={key} el_id={id} floated="right" color="green" icon="arrow circle down" size="mini" />
             <Button onClick={this.handleMoveUp} value={key} el_id={id} floated="right" color="green" icon="arrow circle up" size="mini" />
-            <span onClick={this.makeExerciseValid} json_key={key} style={ is_valid ? {cursor: "pointer", fontWeight: "bold"} : {cursor: "pointer"} }>{html_details}</span>
+            <span onClick={this.makeExerciseValid} json_key={key} style={is_valid ? { cursor: "pointer", fontWeight: "bold" } : { cursor: "pointer" }}>{html_details}</span>
         </Segment>
 
         return { "content": content, "order": json_details["order"] }
@@ -192,27 +205,29 @@ class ExerciseModal extends Component {
                         onChange={e => this.setState({ question: e.target.value })}
                         value={this.state.question}
                         label="Provide a question" />
-                    <Form.Field>
-                        <Button
-                            content="Choose File"
-                            labelPosition="left"
-                            icon="file"
-                            onClick={() => this.fileInputRef.current.click()}
-                        />
-                        <input
-                            ref={this.fileInputRef}
-                            type="file"
-                            hidden
-                            onChange={this.fileChange}
-                        />
-                    </Form.Field>
-                    <Image.Group size="tiny">
-                        {
-                            this.state.images.map((image, idx) => {
-                                return <Image key={idx} src={image} />
-                            })
-                        }
-                    </Image.Group>
+                    <Dropzone onDrop={(images) => this.setState({ images: this.state.images.concat(images) })}>
+                        {({ getRootProps, getInputProps }) => (
+                            <section style={{ marginTop: "1rem" }} className="container">
+                                <div style={{ cursor: "pointer", marginBottom: "1rem" }} {...getRootProps({ className: 'dropzone' })}>
+                                    <input {...getInputProps()} />
+                                    <span style={{ fontWeight: "bold", margin: "1rem" }}>Add Files</span>
+                                    <Button size="large" icon='upload' />
+                                </div>
+                                <aside>
+                                    <h4>Files</h4>
+                                    <ul>
+                                        {
+                                            this.state.images.map((file, idx) => (
+                                                <li style={{ cursor: "pointer" }} onClick={this.removeFile} fileID={idx} key={file.name}>
+                                                    {file.name} - {file.size} bytes
+                                                </li>
+                                            ))
+                                        }
+                                    </ul>
+                                </aside>
+                            </section>
+                        )}
+                    </Dropzone>
                     <Form.Group>
                         <Form.Input
                             fluid
