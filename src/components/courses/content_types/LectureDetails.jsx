@@ -189,10 +189,6 @@ class LectureDetails extends Component {
     changeGlobalLectureAttribute(attribute, attrValue) {
         const lectureGlobalComponents = this.props.lectureComponents
 
-        console.log(lectureGlobalComponents)
-        console.log(this.props.lessonID)
-        console.log(this.props.lectureID)
-
         const lectureJson = lectureGlobalComponents[this.props.lessonID][this.props.lectureID][1]
         lectureJson[attribute] = attrValue
 
@@ -227,14 +223,13 @@ class LectureDetails extends Component {
     }
 
     render() {
-        {console.log(this.props.qaComponents)}
         return (
             <div>
                 <Form>
                     <Form.Field
-                        id="form-input-control-practice-name"
+                        id="form-input-control-lecture-name"
                         control={Input}
-                        label='Practice name'
+                        label='Lecture name'
                         placeholder='Multiplication with 2'
                         width={12}
                         value={this.state.lectureName}
@@ -243,10 +238,10 @@ class LectureDetails extends Component {
                     />
 
                     <Form.Field
-                        id='form-textarea-control-practice-description'
+                        id='form-textarea-control-lecture-description'
                         control={TextArea}
                         label='Description'
-                        placeholder='Practice description'
+                        placeholder='Lecture description'
                         value={this.state.lectureDescription}
                         onKeyUp={this.onTypingDescription}
                         onChange={e => { this.setState({ lectureDescription: e.target.value }) }}

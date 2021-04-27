@@ -68,7 +68,6 @@ class QuestionModal extends Component {
                 const globalLectureQaComponents = this.props.lectureQaComponents
                 globalLectureQaComponents[this.props.modalID] = lectureQaComponents
                 this.props.modifyLectureQaComponents(globalLectureQaComponents)
-                console.log(this.state.lectureQaComponents)
             }
     }
 
@@ -95,7 +94,7 @@ class QuestionModal extends Component {
     }
 
     makeExerciseValid(e) {
-        const key = e.target.getAttribute('json_key')
+        const key = e.currentTarget.getAttribute('json_key')
         let contentAnswer = this.state.lectureQaComponents
 
         contentAnswer[key][1]["is_valid"] = !contentAnswer[key][1]["is_valid"]
@@ -126,7 +125,7 @@ class QuestionModal extends Component {
             <Button onClick={this.handleRemoveExercise} value={key} floated="right" color="red" icon="remove circle" size="mini" />
             <Button onClick={this.handleMoveDown} value={key} el_id={id} floated="right" color="green" icon="arrow circle down" size="mini" />
             <Button onClick={this.handleMoveUp} value={key} el_id={id} floated="right" color="green" icon="arrow circle up" size="mini" />
-            <span onClick={this.makeExerciseValid} json_key={key} style={ is_valid ? {cursor: "pointer", fontWeight: "bold"} : {cursor: "pointer"} }>{html_details}</span>
+            <span onClick={this.makeExerciseValid} json_key={key} value={id} style={ is_valid ? {cursor: "pointer", fontWeight: "bold"} : {cursor: "pointer"} }>{html_details}</span>
         </Segment>
 
         return { "content": content, "order": json_details["order"] }

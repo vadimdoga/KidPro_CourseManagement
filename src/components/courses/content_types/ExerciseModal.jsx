@@ -25,7 +25,6 @@ class ExerciseModal extends Component {
         this.handleRemoveExercise = this.handleRemoveExercise.bind(this)
         this.handleMoveUp = this.handleMoveUp.bind(this)
         this.handleMoveDown = this.handleMoveDown.bind(this)
-        this.fileChange = this.fileChange.bind(this)
         this.handleAddExercise = this.handleAddExercise.bind(this)
         this.handleSave = this.handleSave.bind(this)
         this.removeFile = this.removeFile.bind(this)
@@ -82,7 +81,6 @@ class ExerciseModal extends Component {
                 const globalQaComponents = this.props.qaComponents
                 globalQaComponents[this.props.modalID] = qaComponents
                 this.props.modifyQaComponents(globalQaComponents)
-                console.log(this.state.qaComponents)
             }
     }
 
@@ -118,12 +116,6 @@ class ExerciseModal extends Component {
             qaComponents: contentAnswer
         })
 
-    }
-
-    fileChange = (e) => {
-        this.setState({ images: [...this.state.images, e.target.files[0]] }, () => {
-            console.log("File chosen --->", this.state.image_blob);
-        })
     }
 
     orderContent() {
