@@ -8,6 +8,8 @@ import 'semantic-ui-css/semantic.min.css'
 //redux
 import { Provider } from 'react-redux'
 import { createStore, combineReducers } from "redux"
+import devToolsEnhancer from 'remote-redux-devtools'
+import * as actionCreators from './redux/actions/contentActions'
 //reducers
 import modalReducer from "./redux/reducers/modalReducer"
 import contentReducer from "./redux/reducers/contentReducer"
@@ -17,7 +19,11 @@ const allReducers = combineReducers({
     modal: modalReducer
 })
 
-const store = createStore(allReducers)
+const store = createStore(allReducers, devToolsEnhancer({
+    name: 'Course Management app', realtime: true,
+    secure: false,
+    actionCreators
+}))
 
 ReactDOM.render(
   <Provider store={store}>

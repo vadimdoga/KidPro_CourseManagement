@@ -1,11 +1,13 @@
 const initState = {
     lessonComponents: {},
+
     practiceComponents: {},
+    exerciseComponents: {},
+    qaComponents: {},
+
     lectureComponents: {},
     lectureQaComponents: {},
     lectureQuestionComponents: {},
-    exerciseComponents: {},
-    qaComponents: {}
 }
 
 const contentReducer = (state = initState, action) => {
@@ -30,6 +32,13 @@ const contentReducer = (state = initState, action) => {
             ...state,
             practiceComponents: practiceComponents
         }
+    } else if (action.type === 'MODIFY_QA_COMPONENTS') {
+        const qaComponents = action.element
+
+        return {
+            ...state,
+            qaComponents: qaComponents
+        }
     } else if (action.type === 'MODIFY_LECTURE_COMPONENTS') {
         const lectureComponents = action.element
 
@@ -50,13 +59,6 @@ const contentReducer = (state = initState, action) => {
         return {
             ...state,
             lectureQuestionComponents: lectureQuestionComponents
-        }
-    } else if (action.type === 'MODIFY_QA_COMPONENTS') {
-        const qaComponents = action.element
-
-        return {
-            ...state,
-            qaComponents: qaComponents
         }
     }
 

@@ -4,7 +4,7 @@ import ExpandDetails from "../../course_components/ExpandDetails"
 import PracticeDetails from "./PracticeDetails"
 import LectureDetails from "./LectureDetails"
 import PopupDetails from "../../course_components/PopupDetails"
-import { prepare_practice_components } from "../../../adapters/content"
+import { prepare_practice_components, prepare_lecture_components } from "../../../adapters/content"
 import { v4 as uuid } from "uuid"
 
 //redux
@@ -155,9 +155,6 @@ class LessonDetails extends Component {
         console.log("Lessons")
         console.log(lessons)
 
-        // console.log("Practices")
-        // console.log(this.props.practiceComponents)
-
         const jsonPractices = prepare_practice_components(
             this.props.practiceComponents[this.props.lessonID],
             this.props.exerciseComponents,
@@ -167,11 +164,14 @@ class LessonDetails extends Component {
         console.log("Practices")
         console.log(jsonPractices)
 
+        const jsonLectures = prepare_lecture_components(
+            this.props.lectureComponents[this.props.lessonID],
+            this.props.lectureQuestionComponents,
+            this.props.lectureQaComponents
+        )
 
-        // console.log("Exercises")
-        // console.log(this.props.exerciseComponents)
-        // console.log("qa")
-        // console.log(this.props.qaComponents)
+        console.log("Lectures")
+        console.log(jsonLectures)
     }
 
     handleAddContent(e) {

@@ -20,13 +20,13 @@ class LectureDetails extends Component {
     constructor(props) {
         super(props)
 
-        this.saveExerciseComponent = this.saveExerciseComponent.bind(this)
+        this.saveQuestionComponent = this.saveQuestionComponent.bind(this)
         this.createExpandable = this.createExpandable.bind(this)
         this.handleRemove = this.handleRemove.bind(this)
         this.handleMoveUp = this.handleMoveUp.bind(this)
         this.handleMoveDown = this.handleMoveDown.bind(this)
         this.handleModalClick = this.handleModalClick.bind(this)
-        this.handleBtnClick = this.handleBtnClick.bind(this)
+        this.handleAddLecture = this.handleAddLecture.bind(this)
         this.onTypingDescription = this.onTypingDescription.bind(this)
         this.onTypingName = this.onTypingName.bind(this)
         this.removeFile = this.removeFile.bind(this)
@@ -111,7 +111,7 @@ class LectureDetails extends Component {
             }
     }
 
-    saveExerciseComponent(e, questionDetails) {
+    saveQuestionComponent(e, questionDetails) {
         const lectureQuestionComponents = this.state.lectureQuestionComponents
         const lectureLength = Object.keys(lectureQuestionComponents).length
 
@@ -128,6 +128,10 @@ class LectureDetails extends Component {
             start_time: 0
         })
 
+        this.props.modifyModalID(null)
+        this.props.modifyModalData({})
+        this.props.modifyModalTag(null)
+
         const lectureGlobalComponents = this.props.lectureQuestionComponents
         lectureGlobalComponents[this.props.lectureID] = lectureQuestionComponents
 
@@ -139,10 +143,10 @@ class LectureDetails extends Component {
         this.props.modifyModalID(key)
         this.props.modifyModalData(data)
 
-        this.props.modifyModalTag(<QuestionModal saveExerciseComponent={this.saveExerciseComponent} />)
+        this.props.modifyModalTag(<QuestionModal saveQuestionComponent={this.saveQuestionComponent} />)
     }
 
-    handleBtnClick(e) {
+    handleAddLecture(e) {
         const newKey = uuid()
         const lectureQaComponents = this.props.lectureQaComponents
         lectureQaComponents[newKey] = {}
@@ -156,7 +160,7 @@ class LectureDetails extends Component {
             "start_time": this.state.start_time
         })
 
-        this.props.modifyModalTag(<QuestionModal saveExerciseComponent={this.saveExerciseComponent} />)
+        this.props.modifyModalTag(<QuestionModal saveQuestionComponent={this.saveQuestionComponent} />)
     }
 
     orderContent() {
@@ -223,6 +227,7 @@ class LectureDetails extends Component {
     }
 
     render() {
+        {console.log(this.props.qaComponents)}
         return (
             <div>
                 <Form>
@@ -272,7 +277,7 @@ class LectureDetails extends Component {
                 </Dropzone>
                 <br />
                 <Input circular icon='time' value={this.state.start_time} onChange={e => this.setState({ start_time: e.target.value })} iconPosition='left' placeholder='Question start_time' />
-                <Button onClick={this.handleBtnClick} style={{ marginLeft: "1rem" }} circular size="small" color="green" icon='plus circle' />
+                <Button onClick={this.handleAddLecture} style={{ marginLeft: "1rem" }} circular size="small" color="green" icon='plus circle' />
 
                 <Segment.Group style={exercises_style}>
                     {
@@ -289,6 +294,7 @@ const mapStateToProps = (state) => {
         isOpen: state.modal.modalIsOpen,
         modalTag: state.modal.modalTag,
         modalID: state.modal.modalID,
+        qaComponents: state.content.qaComponents,
 
         lectureComponents: state.content.lectureComponents,
         lectureQuestionComponents: state.content.lectureQuestionComponents,

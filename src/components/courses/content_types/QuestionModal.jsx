@@ -161,7 +161,7 @@ class QuestionModal extends Component {
         this.props.modifyModalState(false)
         this.props.modifyLectureQaComponents(lectureQaComponents)
 
-        this.props.saveExerciseComponent(e, {
+        this.props.saveQuestionComponent(e, {
             "question": this.state.question,
             "speech_2_text": this.state.speech_2_text,
             "start_time": this.state.start_time
@@ -231,7 +231,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        modifyLectureQaComponents: (element) => { dispatch(modifyLectureQaComponents(element, 'MODIFY_QA_COMPONENTS')) },
+        modifyLectureQaComponents: (element) => { dispatch(modifyLectureQaComponents(element, 'MODIFY_LECTURE_QA_COMPONENTS')) },
         modifyModalState: (element) => { dispatch(modifyModalState(element, 'MODIFY_MODAL_STATE')) },
         modifyModalTag: (element) => { dispatch(modifyModalTag(element, 'MODIFY_MODAL_TAG')) },
     }
